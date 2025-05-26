@@ -14,7 +14,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 @Entity
@@ -25,13 +28,17 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Nome é obrigatório")
     private String nome;
 
+    @NotBlank(message = "E-mail é obrigatório")
+    @Email(message = "E-mail inválido")
     private String email;
 
- 
+    @NotBlank(message = "Senha é obrigatória")
+    @Size(min = 8, message = "A senha deve ter pelo menos 8 caracteres")
+    @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).+$", message = "Senha deve conter ao menos 1 maiúscula, 1 número e 1 caractere especial")
     private String senha;
-
     private int idade;
 
     private String cpf;
@@ -46,12 +53,10 @@ public class Usuario {
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Agendamento> agendamentos =  new ArrayList<>();
 
-    // Construtor padrão
     public Usuario() {
-        this.role = Role.ADMINISTRADOR;  // Definindo o papel padrão como USER
+        this.role = Role.ADMINISTRADOR;  
     }
 
-    // Construtor completo
     public Usuario(@NotNull @Size(min = 3, max = 100) String nome, @NotNull String email, @NotNull String senha,
                    @NotNull int idade, @NotNull String cpf, @NotNull String telefone, @NotNull String endereco, Role role) {
         this.nome = nome;
@@ -63,8 +68,6 @@ public class Usuario {
         this.endereco = endereco;
         this.role = role != null ? role : Role.ADMINISTRADOR; 
     }
-
-    // Getters e setters
 
     public Long getId() {
         return id;

@@ -1,19 +1,19 @@
 package com.AgendamentoOn.Controller;
 
+import com.AgendamentoOn.Model.Usuario;
+import com.AgendamentoOn.Service.UsuarioService;
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-
-import com.AgendamentoOn.Enum.Role;
-import com.AgendamentoOn.Model.Usuario;
-import com.AgendamentoOn.Service.UsuarioService;
-
-import jakarta.servlet.http.HttpSession;
+import org.springframework.security.core.Authentication;
 
 @Controller
 public class CadastroController {
@@ -22,36 +22,33 @@ public class CadastroController {
     private UsuarioService usuarioService;
 
     @Autowired
-    private PasswordEncoder passwordEncoder; 
+    private AuthenticationManager authenticationManager;
 
-    @GetMapping("/cadastro")
-    public String exibirFormulario(Model model) {
+    @GetMapping("/cadastrar")
+    public String showCadastroForm(Model model) {
         model.addAttribute("usuario", new Usuario());
-        return "cadastro"; 
+        model.addAttribute("pageTitle", "Cadastro de Cliente");
+        return "cadastrar"; 
     }
 
-    @PostMapping("/cadastro")
-    public String cadastrar(@Validated Usuario usuario, BindingResult bindingResult, Model model, HttpSession session) {
-        if (bindingResult.hasErrors()) {
-            return "cadastro"; 
-        }
+    @PostMapping("/cadastrar")
+public String processCadastro(@Valid Usuario usuario, BindingResult bindingResult, Model model) {
 
-        try {
+    usuarioService.salvar(usuario, bindingResult); // valida e salva
 
-            usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
-
-            usuario.setRole(Role.CLIENTE);
-
-            usuarioService.Salvar(usuario);
-
-
-            session.setAttribute("usuario", usuario);
-
-
-            return "redirect:/home";
-        } catch (Exception e) {
-            model.addAttribute("error", "Erro ao cadastrar usuário.");
-            return "cadastro"; 
-        }
+    if (bindingResult.hasErrors()) {
+        model.addAttribute("pageTitle", "Cadastro de Cliente");
+        return "cadastrar";
     }
+
+    // Autenticar o usuário depois de cadastrado
+    UsernamePasswordAuthenticationToken authToken = 
+        new UsernamePasswordAuthenticationToken(usuario.getEmail(), usuario.getSenha());
+
+    Authentication authentication = authenticationManager.authenticate(authToken);
+    SecurityContextHolder.getContext().setAuthentication(authentication);
+
+    model.addAttribute("successMessage", "Cliente cadastrado com sucesso!");
+    return "redirect:/";
+}
 }

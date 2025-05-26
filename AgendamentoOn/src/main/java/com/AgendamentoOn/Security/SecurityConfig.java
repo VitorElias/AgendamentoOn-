@@ -21,23 +21,27 @@ public class SecurityConfig {
         this.customUserDetailsService = customUserDetailsService;
     }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .authorizeRequests()
-                .requestMatchers("/", "/login", "/cadastro", "/home").permitAll()  // Páginas públicas
-                .anyRequest().authenticated()  // Qualquer outra página requer autenticação
-            .and()
-            .formLogin()
-                .loginPage("/login")  // Página de login personalizada
-                .permitAll()
-                .defaultSuccessUrl("/home", true)  // Redireciona para /home após login bem-sucedido
-            .and()
-            .logout()
-                .permitAll()
-                .logoutSuccessUrl("/login?logout");  // Redireciona para /login após logout
-        return http.build();
-    }
+ @Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .authorizeRequests()
+            .requestMatchers("/", "/login", "/cadastrar", "/recuperar","/termos","/politicas", "/assets/**").permitAll()
+            .anyRequest().authenticated()
+        .and()
+        .formLogin()
+            .loginPage("/login")
+            .defaultSuccessUrl("/login-success", true)
+            .failureUrl("/login?error=true")  // redireciona para login com erro
+            .permitAll()
+        .and()
+        .logout()
+            .logoutSuccessUrl("/login?logout=true")
+            .permitAll()
+        .and()
+        .csrf().disable();
+
+    return http.build();
+}
 
     @Bean
     public PasswordEncoder passwordEncoder() {

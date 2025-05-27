@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.AgendamentoOn.Enum.Especialidade;
 import com.AgendamentoOn.Enum.Status;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,6 +24,7 @@ public class Agendamento {
     private Long id;
 
     @NotNull
+    @JsonFormat(pattern = "dd 'de' MMMM 'de' yyyy", locale = "pt_BR")
     private LocalDateTime Data;
 
     @NotNull

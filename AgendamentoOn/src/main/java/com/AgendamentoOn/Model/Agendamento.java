@@ -21,9 +21,9 @@ public class Agendamento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @NotNull
-    private LocalDateTime Horario;
+    private LocalDateTime Data;
 
     @NotNull
     private double valor;
@@ -33,20 +33,18 @@ public class Agendamento {
 
     @NotNull
     private Status status;
-    
+
     @ManyToOne
-    @JoinColumn(name = "usuario_id_cliente") 
+    @JoinColumn(name = "usuario_id_cliente")
     private Usuario cliente;
 
-   
     @ManyToOne
-    @JoinColumn(name = "usuario_id_profissional")  
+    @JoinColumn(name = "usuario_id_profissional")
     private Usuario profissional;
 
-
-    public Agendamento(@NotNull LocalDateTime horario, @NotNull double valor, @NotNull Especialidade especialidade,
+    public Agendamento(@NotNull LocalDateTime data, @NotNull double valor, @NotNull Especialidade especialidade,
             Usuario cliente, Usuario profissional, Status status) {
-        Horario = horario;
+        Data = data;
         this.status = status;
         this.valor = valor;
         this.especialidade = especialidade;
@@ -62,12 +60,12 @@ public class Agendamento {
         this.id = id;
     }
 
-    public LocalDateTime getHorario() {
-        return Horario;
+    public LocalDateTime getData() {
+        return Data;
     }
 
-    public void setHorario(LocalDateTime horario) {
-        Horario = horario;
+    public void setData(LocalDateTime horario) {
+        Data = horario;
     }
 
     public double getValor() {
@@ -110,10 +108,4 @@ public class Agendamento {
         this.status = status;
     }
 
-    
- 
-    
-
-
-    
 }

@@ -25,45 +25,50 @@ public class UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
-     public void salvar(Usuario usuario, BindingResult bindingResult) {
-    // Verifica se já existe usuário com esse email
-    if (usuarioRepository.findByEmail(usuario.getEmail()) != null) {
-        bindingResult.rejectValue("email", "error.usuario", "Email já cadastrado");
+    public void salvar(Usuario usuario, BindingResult bindingResult) {
+        // Verifica se já existe usuário com esse email
+        if (usuarioRepository.findByEmail(usuario.getEmail()).isPresent()) {
+            bindingResult.rejectValue("email", "error.usuario", "Email já cadastrado");
+        }
+
+        /*
+         * 
+         * if (usuarioRepository.findByEmail(usuario.getEmail()) != null) {
+         * bindingResult.rejectValue("email", "error.usuario", "Email já cadastrado");
+         * }
+         * 
+         */
+
+        // Se tiver erros, não salva
+        if (bindingResult.hasErrors()) {
+            return;
+        }
+
+        // Criptografa a senha
+        usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+
+        // Salva o usuário
+        usuarioRepository.save(usuario);
     }
-
-    // Se tiver erros, não salva
-    if (bindingResult.hasErrors()) {
-        return;
-    }
-
-    // Criptografa a senha
-    usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
-
-    // Salva o usuário
-    usuarioRepository.save(usuario);
-}
-
 
     public Optional<Usuario> getUsuarioPorId(Long id) {
-        return usuarioRepository.findById(id);  
+        return usuarioRepository.findById(id);
     }
 
     public List<Usuario> getTodosUsuarios() {
-        return usuarioRepository.findAll(); 
+        return usuarioRepository.findAll();
     }
 
     public Usuario AtualizarUsuario(Long id, Usuario usuario) {
         if (usuarioRepository.existsById(id)) {
             usuario.setId(id);
-            return usuarioRepository.save(usuario); 
+            return usuarioRepository.save(usuario);
         }
-        return null;  
+        return null;
     }
-
-   
 
     public Optional<Usuario> findByEmail(String email) {
         return usuarioRepository.findByEmail(email);
     }
-    
+
 }

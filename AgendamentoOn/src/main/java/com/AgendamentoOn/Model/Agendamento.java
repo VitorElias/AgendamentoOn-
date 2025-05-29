@@ -7,6 +7,8 @@ import com.AgendamentoOn.Enum.Status;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,8 +26,8 @@ public class Agendamento {
     private Long id;
 
     @NotNull
-    @JsonFormat(pattern = "dd 'de' MMMM 'de' yyyy", locale = "pt_BR")
-    private LocalDateTime Data;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") // Use o ISO no front
+    private LocalDateTime data;
 
     @NotNull
     private double valor;
@@ -46,7 +48,7 @@ public class Agendamento {
 
     public Agendamento(@NotNull LocalDateTime data, @NotNull double valor, @NotNull Especialidade especialidade,
             Usuario cliente, Usuario profissional, Status status) {
-        Data = data;
+        this.data = data; // Corrigido
         this.status = status;
         this.valor = valor;
         this.especialidade = especialidade;
@@ -63,11 +65,11 @@ public class Agendamento {
     }
 
     public LocalDateTime getData() {
-        return Data;
+        return data;
     }
 
     public void setData(LocalDateTime horario) {
-        Data = horario;
+        data = horario;
     }
 
     public double getValor() {

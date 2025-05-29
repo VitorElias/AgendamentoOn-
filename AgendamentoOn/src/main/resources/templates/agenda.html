@@ -1,582 +1,624 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Agenda - AgendamentoOn</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="../assets/css/style.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-    />
-    <style>
-      html, body {
-        overflow: hidden;
-        margin: 0;
-        font-family: "Segoe UI", sans-serif;
-        background-color: #f1f5f9;
-      }
 
-      header {
-        background-color: #ffffff;
-        border-bottom: 1px solid #dee2e6;
-        padding: 1rem 2rem;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agenda - AgendamentoOn</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    html,
+    body {
+      overflow: hidden;
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background-color: #f1f5f9;
+    }
 
-      .sidebar {
-        background-color: #985d78;
-        color: white;
-        height: 100vh;
-        padding: 2rem 1rem;
-        width: 260px;
-        display: flex;
-        flex-direction: column;
-      }
+    header {
+      background-color: #ffffff;
+      border-bottom: 1px solid #dee2e6;
+      padding: 1rem 2rem;
+    }
 
-      .sidebar a {
-        color: white;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 1.2rem;
-        font-weight: 500;
-        text-decoration: none;
-      }
+    .sidebar {
+      background-color: #985d78;
+      color: white;
+      height: 100vh;
+      padding: 2rem 1rem;
+      width: 260px;
+      display: flex;
+      flex-direction: column;
+    }
 
-      .sidebar a.active, .sidebar a:hover {
-        background-color: #ffffff;
-        color: #985d78;
-        border-radius: 8px;
-        padding: 0.5rem 1rem;
-      }
+    .sidebar a {
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.2rem;
+      font-weight: 500;
+      text-decoration: none;
+    }
 
-      .sidebar .policies a {
-        font-size: 0.85rem;
-        text-decoration: none;
-      }
+    .sidebar a.active,
+    .sidebar a:hover {
+      background-color: #ffffff;
+      color: #985d78;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+    }
 
-      .btn-sair {
-        background-color: #f1f5f9;
-        font-weight: 500;
-      }
+    .sidebar .policies a {
+      font-size: 0.85rem;
+      text-decoration: none;
+    }
 
-      .calendar-box {
-        background-color: white;
-        padding: 2rem;
-        border-radius: 20px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-      }
+    .btn-sair {
+      background-color: #f1f5f9;
+      font-weight: 500;
+    }
 
-      #monthYear {
-        color: #985d78;
-      }
+    .calendar-box {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
 
-      .calendar-day {
-        cursor: pointer;
-        color: #985d78;
-        border-radius: 50%;
-        transition: background-color 0.3s;
-        display: inline-block;
-        width: 2rem;
-        height: 2rem;
-        line-height: 2rem;
-      }
+    #monthYear {
+      color: #985d78;
+    }
 
-      .calendar-day:hover {
-        background-color: #f3e6ea;
-      }
+    .calendar-day {
+      cursor: pointer;
+      color: #985d78;
+      border-radius: 50%;
+      transition: background-color 0.3s;
+      display: inline-block;
+      width: 2rem;
+      height: 2rem;
+      line-height: 2rem;
+    }
 
-      .calendar-day.selected {
-        background-color: #985d78;
-        color: white;
-        font-weight: bold;
-      }
+    .calendar-day:hover {
+      background-color: #f3e6ea;
+    }
 
-      thead th {
-        color: #985d78;
-        font-weight: 600;
-      }
+    .calendar-day.selected {
+      background-color: #985d78;
+      color: white;
+      font-weight: bold;
+    }
 
-      .btn-confirm {
-        background-color: #22c55e;
-        color: white;
-        font-weight: bold;
-        border-radius: 8px;
-        padding: 0.75rem 1.5rem;
-        border: none;
-      }
+    thead th {
+      color: #985d78;
+      font-weight: 600;
+    }
 
-      .btn-agendar {
-        background-color: #985d78;
-        color: white;
-        font-weight: bold;
-        border: none;
-        padding: 0.5rem 1.5rem;
-        border-radius: 6px;
-      }
+    .btn-confirm {
+      background-color: #22c55e;
+      color: white;
+      font-weight: bold;
+      border-radius: 8px;
+      padding: 0.75rem 1.5rem;
+      border: none;
+    }
 
-      .btn-warning {
-        background-color: #ffc107;
-        color: #333;
-        border: none;
-        font-weight: bold;
-      }
+    .btn-agendar {
+      background-color: #985d78;
+      color: white;
+      font-weight: bold;
+      border: none;
+      padding: 0.5rem 1.5rem;
+      border-radius: 6px;
+    }
 
-      #sec-servicos {
-        font-size: 0.95rem;
-        color: #333;
-      }
+    .btn-warning {
+      background-color: #ffc107;
+      color: #333;
+      border: none;
+      font-weight: bold;
+    }
 
-      #sec-servicos h5 {
-        color: #985d78;
-        font-weight: 600;
-        font-size: 1.05rem;
-      }
+    #sec-servicos {
+      font-size: 0.95rem;
+      color: #333;
+    }
 
-      #sec-servicos .bg-white {
-        background-color: white;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-      }
+    #sec-servicos h5 {
+      color: #985d78;
+      font-weight: 600;
+      font-size: 1.05rem;
+    }
 
-      #sec-servicos th {
-        font-weight: 600;
-        font-size: 0.95rem;
-        padding-bottom: 0.5rem;
-        color: #333;
-      }
+    #sec-servicos .bg-white {
+      background-color: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
 
-      #sec-servicos td {
-        padding: 0.4rem 0;
-        font-weight: 400;
-        vertical-align: middle;
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Header -->
-    <header class="d-flex justify-content-between align-items-center" role="banner" aria-label="Cabeçalho principal">
-      <div class="d-flex align-items-center gap-3">
-        <img src="../assets/img/logo-agendamento.png" alt="Logo do AgendamentoOn - Studio Irys Lima" style="height: 40px" />
-        <span class="fw-semibold text-secondary">AgendamentoOn - Studio Irys Lima</span>
+    #sec-servicos th {
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding-bottom: 0.5rem;
+      color: #333;
+    }
+
+    #sec-servicos td {
+      padding: 0.4rem 0;
+      font-weight: 400;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="d-flex justify-content-between align-items-center" role="banner" aria-label="Cabeçalho principal">
+    <div class="d-flex align-items-center gap-3">
+      <img src="../assets/img/logo-agendamento.png" alt="Logo do AgendamentoOn - Studio Irys Lima"
+        style="height: 40px" />
+      <span class="fw-semibold text-secondary">AgendamentoOn - Studio Irys Lima</span>
+    </div>
+    <button id="btnSair" class="btn btn-outline-secondary" aria-label="Botão para sair da aplicação">Sair</button>
+  </header>
+
+  <div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar d-flex flex-column">
+      <div>
+        <a href="#" class="active" data-section="agenda"><i class="fa-regular fa-calendar-days"></i> Agenda</a>
+        <a href="#" data-section="agendamentos"><i class="fa-regular fa-clock"></i> Meus Agendamentos</a>
+        <a href="#" data-section="servicos"><i class="fa-solid fa-spa"></i> Serviços</a>
+        <a href="#" data-section="horario"><i class="fa-regular fa-clock"></i> Horário de Funcionamento</a>
+        <a href="#" data-section="perfil"><i class="fa-regular fa-user"></i> Meu perfil</a>
       </div>
-      <button id="btnSair" class="btn btn-outline-secondary" aria-label="Botão para sair da aplicação">Sair</button>
-    </header>
-
-    <div class="d-flex">
-      <!-- Sidebar -->
-      <div class="sidebar d-flex flex-column">
-        <div>
-          <a href="#" class="active" data-section="agenda"><i class="fa-regular fa-calendar-days"></i> Agenda</a>
-          <a href="#" data-section="agendamentos"><i class="fa-regular fa-clock"></i> Meus Agendamentos</a>
-          <a href="#" data-section="servicos"><i class="fa-solid fa-spa"></i> Serviços</a>
-          <a href="#" data-section="horario"><i class="fa-regular fa-clock"></i> Horário de Funcionamento</a>
-          <a href="#" data-section="perfil"><i class="fa-regular fa-user"></i> Meu perfil</a>
-        </div>
-        <div class="policies mt-auto" style="position: relative; bottom: 50px">
-          <a href="/login/termos.html"
-            ><i class="fa-regular fa-file-lines"></i> Termo de Consentimento e
-            Política de Privacidade</a
-          ><br />
-          <a href="/login/politicas.html"
-            ><i class="fa-regular fa-file-lines"></i> Política de Cancelamento e
-            Reagendamento</a
-          >
-        </div>
+      <div class="policies mt-auto" style="position: relative; bottom: 50px">
+        <a href="/login/termos.html"><i class="fa-regular fa-file-lines"></i> Termo de Consentimento e
+          Política de Privacidade</a><br />
+        <a href="/login/politicas.html"><i class="fa-regular fa-file-lines"></i> Política de Cancelamento e
+          Reagendamento</a>
       </div>
+    </div>
 
-      <!-- Conteúdo principal -->
-      <div class="flex-grow-1 p-4">
-        <!-- Seção Agenda -->
-        <section id="sec-agenda">
-          <h3 class="fw-bold text-main mb-2" style="color: #985d78">Agenda</h3>
-          <p class="text-muted mb-4">Escolha uma data para o agendamento:</p>
+    <!-- Conteúdo principal -->
+    <div class="flex-grow-1 p-4">
+      <!-- Seção Agenda -->
+      <section id="sec-agenda">
+        <h3 class="fw-bold text-main mb-2" style="color: #985d78">Agenda</h3>
+        <p class="text-muted mb-4">Escolha uma data para o agendamento:</p>
 
-          <div class="calendar-box mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <button class="btn btn-light border" id="prevMonth">
-                <i class="fas fa-chevron-left"></i>
-              </button>
-              <h5
-                class="fw-bold mb-0 d-flex gap-2 align-items-center"
-                id="monthYear"
-              ></h5>
-              <button class="btn btn-light border" id="nextMonth">
-                <i class="fas fa-chevron-right"></i>
-              </button>
-            </div>
-            <div class="table-responsive">
-              <table class="table table-borderless text-center align-middle">
-                <thead>
-                  <tr class="text-muted">
-                    <th>DOM</th>
-                    <th>SEG</th>
-                    <th>TER</th>
-                    <th>QUA</th>
-                    <th>QUI</th>
-                    <th>SEX</th>
-                    <th>SAB</th>
-                  </tr>
-                </thead>
-                <tbody id="calendarBody"></tbody>
-              </table>
-            </div>
-          </div>
-          <button class="btn btn-confirm">Confirmar Data</button>
-        </section>
-
-        <!-- Seção Agenda / Serviço -->
-        <section id="sec-agendar-servico" style="display: none;">
-          <div class="d-flex justify-content-center align-items-start" style="min-height: calc(100vh - 100px); padding-top: 2rem;">
-            <div style="width: 100%; max-width: 700px;">
-              <h3 class="fw-bold mb-3" style="color: #985D78;">Agenda / Serviço</h3>
-              <p class="text-muted fw-semibold mb-4" id="dataSelecionadaTexto">Data do agendamento: 30 de Abril de 2025</p>
-
-              <div class="bg-white p-4 rounded-3 shadow-sm">
-                <div class="mb-4">
-                  <label for="servicoSelect" class="form-label fw-semibold">Escolha um serviço para o agendamento:</label>
-                  <select id="servicoSelect" class="form-select" aria-label="Selecione o serviço desejado">
-                    <option selected disabled>Selecione as opções</option>
-                    <option>Cílios: Volume brasileiro</option>
-                    <option>Cílios: Efeito fox</option>
-                    <option>Cílios: Efeito Molhado</option>
-                    <option>Cílios: Volume 5D</option>
-                    <option>Sobrancelhas: Design de sobrancelhas</option>
-                    <option>Sobrancelhas: Design com henna</option>
-                    <option>Sobrancelhas: Brow lamination</option>
-                    <option>Sobrancelhas: Lash lifting</option>
-                  </select>
-                </div>
-
-                <div class="d-flex gap-2">
-                  <button id="btnConfirmarServico" class="btn w-100 fw-bold text-white" style="background-color: #22C55E;">
-                    Confirmar Serviço
-                  </button>
-                  <button id="btnVoltarParaAgenda" class="btn w-100 fw-bold text-white" style="background-color: #CBD5E1;">
-                    Voltar
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Seção Agenda / Serviço / Horário -->
-        <section id="sec-agendar-horario" style="display: none;">
-          <div class="container-fluid">
-            <div class="px-4">
-              <h3 class="fw-bold mb-2" style="color: #985D78;">Agenda / Serviço / Horário</h3>
-              <p class="text-muted fw-semibold mb-1" id="dataSelecionadaHorario">Data do agendamento: 30 de Abril de 2025</p>
-              <p class="text-muted fw-semibold mb-4" id="servicoSelecionadoHorario">Serviço: Sobrancelhas: Design de sobrancelhas</p>
-
-              <div class="bg-white p-4 rounded-3 shadow-sm w-100" style="max-width: 720px;">
-                <label class="form-label fw-semibold mb-3">Escolha um horário para o agendamento:</label>
-                <div class="row row-cols-3 g-3">
-                  <!-- Horários -->
-                  <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">14:00</button></div>
-                  <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">14:30</button></div>
-                  <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">15:00</button></div>
-                  <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">15:30</button></div>
-                  <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">16:00</button></div>
-                  <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">16:30</button></div>
-                  <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">17:00</button></div>
-                  <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">18:00</button></div>
-                  <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">18:30</button></div>
-                  <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">19:00</button></div>
-                  <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">19:30</button></div>
-                  <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">20:00</button></div>
-                  <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">20:30</button></div>
-                  <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">21:00</button></div>
-                  <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">21:30</button></div>
-                </div>
-
-                <div class="d-flex gap-2 mt-4">
-                  <button id="btnConfirmarHorario" class="btn w-100 fw-bold text-white" style="background-color: #22C55E;">
-                    Confirmar Horário
-                  </button>
-                  <button id="btnVoltarParaServico" class="btn w-100 fw-bold text-white" style="background-color: #CBD5E1;">
-                    Voltar
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Seção Agenda / Serviço / Horário / Confirmação -->
-        <section id="sec-agendar-confirmacao" style="display: none;">
-          <div class="container-fluid">
-            <div class="px-4">
-              <h3 class="fw-bold mb-2" style="color: #985D78;">Agenda / Serviço / Horário / Confirmação</h3>
-              <p class="text-muted fw-semibold mb-4">Confirme as informações do agendamento solicitado:</p>
-
-              <div class="bg-white p-4 rounded-3 shadow-sm mb-4" style="max-width: 720px;">
-                <table class="table mb-4">
-                  <thead class="text-secondary">
-                    <tr>
-                      <th>Serviço</th>
-                      <th>Data</th>
-                      <th>Horário</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td id="confirmacaoServico">Sobrancelhas: Design de Sobrancelhas</td>
-                      <td id="confirmacaoData">30/04/2025</td>
-                      <td id="confirmacaoHorario">18:00</td>
-                    </tr>
-                  </tbody>
-                </table>
-
-                <div class="d-flex gap-3">
-                  <button id="btnConfirmarAgendamento" class="btn text-white fw-semibold px-4 py-2" style="background-color: #22C55E;">
-                    Confirmar Agendamento
-                  </button>
-
-                  <button id="btnVoltarParaHorario" class="btn text-white fw-semibold px-4 py-2" style="background-color: #CBD5E1;">
-                    Voltar
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Seção Agenda / Serviço / Horário / Confirmação / Sucesso -->
-        <section id="sec-agendamento-sucesso" style="display: none;">
-          <div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
-            <div class="text-center bg-white p-5 rounded-3 shadow" style="max-width: 500px; width: 100%;">
-              <i class="fa-solid fa-circle-check mb-3" style="font-size: 80px; color: #22C55E;"></i>
-              <h2 class="fw-bold text-success mb-2">Sucesso</h2>
-              <p class="text-secondary fw-semibold">Agendamento realizado com sucesso</p>
-              <button id="btnOkSucesso" class="btn btn-light fw-bold mt-3 px-4">Ok</button>
-            </div>
-          </div>
-        </section>
-
-        <!-- Seção Meus Agendamentos -->
-        <section id="sec-agendamentos" style="display: none">
-          <h3 class="fw-bold mb-4" style="color: #985d78">Meus Agendamentos</h3>
-
-          <div
-            class="bg-white rounded-3 shadow-sm p-3"
-            style="font-family: 'Segoe UI', sans-serif"
-          >
-            <table class="table align-middle mb-0">
-              <thead>
-                <tr class="text-secondary" style="font-weight: 600">
-                  <th>Serviço</th>
-                  <th>Data</th>
-                  <th>Horário</th>
-                  <th class="text-center">Ação</th>
-                </tr>
-              </thead>
-              <tbody id="listaAgendamentos" style="font-weight: 400">
-              </tbody>
-            </table>
-          </div>
-
-          <div class="text-end mt-4">
-            <button
-              id="btnNovoAgendamento"
-              class="btn text-white px-4 py-2 fw-semibold"
-              style="background-color: #985d78"
-              aria-label="Botão para realizar novo agendamento"
-            >
-              + Novo Agendamento
+        <div class="calendar-box mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <button class="btn btn-light border" id="prevMonth">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <h5 class="fw-bold mb-0 d-flex gap-2 align-items-center" id="monthYear"></h5>
+            <button class="btn btn-light border" id="nextMonth">
+              <i class="fas fa-chevron-right"></i>
             </button>
           </div>
-        </section>
+          <div class="table-responsive">
+            <table class="table table-borderless text-center align-middle">
+              <thead>
+                <tr class="text-muted">
+                  <th>DOM</th>
+                  <th>SEG</th>
+                  <th>TER</th>
+                  <th>QUA</th>
+                  <th>QUI</th>
+                  <th>SEX</th>
+                  <th>SAB</th>
+                </tr>
+              </thead>
+              <tbody id="calendarBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <button class="btn btn-confirm">Confirmar Data</button>
+      </section>
 
-        <!-- Seção de detalhes do agendamento -->
-        <section id="sec-agendamento-detalhe" style="display: none;">
-          <div class="container-fluid">
-            <div class="px-4">
-              <h3 class="fw-bold mb-3" style="color: #985d78">Meus Agendamentos / Editar</h3>
-              <p class="text-muted fw-semibold mb-3">Informações do agendamento:</p>
+      <!-- Seção Agenda / Serviço -->
+      <section id="sec-agendar-servico" style="display: none;">
+        <div class="d-flex justify-content-center align-items-start"
+          style="min-height: calc(100vh - 100px); padding-top: 2rem;">
+          <div style="width: 100%; max-width: 700px;">
+            <h3 class="fw-bold mb-3" style="color: #985D78;">Agenda / Serviço</h3>
+            <p class="text-muted fw-semibold mb-4" id="dataSelecionadaTexto">Data do agendamento: 30 de Abril de 2025
+            </p>
 
-              <div class="bg-white p-4 rounded-3 shadow-sm mb-4" style="max-width: 720px;">
-                <table class="table mb-0">
-                  <thead class="text-secondary">
-                    <tr>
-                      <th>Serviço</th>
-                      <th>Data</th>
-                      <th>Horário</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td id="detalheServico"></td>
-                      <td id="detalheData"></td>
-                      <td id="detalheHorario"></td>
-                      <td id="detalheStatus"></td>
-                    </tr>
-                  </tbody>
-                </table>
+            <div class="bg-white p-4 rounded-3 shadow-sm">
+              <div class="mb-4">
+                <label for="servicoSelect" class="form-label fw-semibold">Escolha um serviço para o agendamento:</label>
+                <select id="servicoSelect" class="form-select" aria-label="Selecione o serviço desejado">
+                  <option selected disabled>Selecione as opções</option>
+                  <option>Cílios: Volume brasileiro</option>
+                  <option>Cílios: Efeito fox</option>
+                  <option>Cílios: Efeito Molhado</option>
+                  <option>Cílios: Volume 5D</option>
+                  <option>Sobrancelhas: Design de sobrancelhas</option>
+                  <option>Sobrancelhas: Design com henna</option>
+                  <option>Sobrancelhas: Brow lamination</option>
+                  <option>Sobrancelhas: Lash lifting</option>
+                </select>
               </div>
 
               <div class="d-flex gap-2">
-                <button id="btnExcluirAgendamento" class="btn fw-bold text-white" style="background-color: #dc2626;">
-                  Excluir Agendamento
+                <button id="btnConfirmarServico" class="btn w-100 fw-bold text-white"
+                  style="background-color: #22C55E;">
+                  Confirmar Serviço
                 </button>
-                <button id="btnVoltarAgendamento" class="btn fw-bold text-white" style="background-color: #cbd5e1;">
+                <button id="btnVoltarParaAgenda" class="btn w-100 fw-bold text-white"
+                  style="background-color: #CBD5E1;">
                   Voltar
                 </button>
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <!-- Seção Serviços -->
-        <section id="sec-servicos" style="display: none;">
-          <h3 class="fw-bold mb-4" style="color: #985d78">Serviços</h3>
+      <!-- Seção Agenda / Serviço / Horário -->
+      <section id="sec-agendar-horario" style="display: none;">
+        <div class="container-fluid">
+          <div class="px-4">
+            <h3 class="fw-bold mb-2" style="color: #985D78;">Agenda / Serviço / Horário</h3>
+            <p class="text-muted fw-semibold mb-1" id="dataSelecionadaHorario">Data do agendamento: 30 de Abril de 2025
+            </p>
+            <p class="text-muted fw-semibold mb-4" id="servicoSelecionadoHorario">Serviço: Sobrancelhas: Design de
+              sobrancelhas</p>
 
-          <div class="bg-white p-4 rounded-3 shadow-sm mb-4">
-            <h5 class="fw-semibold mb-3" style="color: #985d78;">Cílios (tempo médio 2 horas)</h5>
-            <table class="table table-borderless align-middle mb-0">
-              <thead class="text-secondary">
-                <tr style="font-weight: 600;">
-                  <th>Serviço</th>
-                  <th>1ª Aplicação</th>
-                  <th>Manutenção</th>
-                </tr>
-              </thead>
-              <tbody style="font-weight: 400;">
-                <tr><td>Volume Brasileiro</td><td>R$ 90,00</td><td>R$ 70,00</td></tr>
-                <tr><td>Efeito Fox</td><td>R$ 100,00</td><td>R$ 80,00</td></tr>
-                <tr><td>Efeito Molhado</td><td>R$ 90,00</td><td>R$ 70,00</td></tr>
-                <tr><td>Volume 5D</td><td>R$ 100,00</td><td>R$ 80,00</td></tr>
-              </tbody>
-            </table>
+            <div class="bg-white p-4 rounded-3 shadow-sm w-100" style="max-width: 720px;">
+              <label class="form-label fw-semibold mb-3">Escolha um horário para o agendamento:</label>
+              <div class="row row-cols-3 g-3">
+                <!-- Horários -->
+                <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">14:00</button></div>
+                <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">14:30</button></div>
+                <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">15:00</button></div>
+                <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">15:30</button></div>
+                <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">16:00</button></div>
+                <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">16:30</button></div>
+                <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">17:00</button></div>
+                <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">18:00</button></div>
+                <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">18:30</button></div>
+                <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">19:00</button></div>
+                <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">19:30</button></div>
+                <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">20:00</button></div>
+                <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">20:30</button></div>
+                <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">21:00</button></div>
+                <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">21:30</button></div>
+              </div>
+
+              <div class="d-flex gap-2 mt-4">
+                <button id="btnConfirmarHorario" class="btn w-100 fw-bold text-white"
+                  style="background-color: #22C55E;">
+                  Confirmar Horário
+                </button>
+                <button id="btnVoltarParaServico" class="btn w-100 fw-bold text-white"
+                  style="background-color: #CBD5E1;">
+                  Voltar
+                </button>
+              </div>
+            </div>
           </div>
+        </div>
+      </section>
 
-          <div class="bg-white p-4 rounded-3 shadow-sm">
-            <h5 class="fw-semibold mb-3" style="color: #985d78;">Sobrancelhas</h5>
-            <table class="table table-borderless align-middle mb-0">
-              <thead class="text-secondary">
-                <tr style="font-weight: 600;">
-                  <th>Serviço</th>
-                  <th>Valor</th>
-                  <th>Tempo</th>
-                </tr>
-              </thead>
-              <tbody style="font-weight: 400;">
-                <tr><td>Design de Sobrancelhas</td><td>R$ 25,00</td><td>30 Minutos</td></tr>
-                <tr><td>Design com Henna</td><td>R$ 35,00</td><td>45 Minutos</td></tr>
-                <tr><td>Brown Lamination</td><td>R$ 60,00</td><td>1 Hora</td></tr>
-                <tr><td>Lash Lifting</td><td>R$ 60,00</td><td>1 Hora</td></tr>
-              </tbody>
-            </table>
+      <!-- Seção Agenda / Serviço / Horário / Confirmação -->
+      <section id="sec-agendar-confirmacao" style="display: none;">
+        <div class="container-fluid">
+          <div class="px-4">
+            <h3 class="fw-bold mb-2" style="color: #985D78;">Agenda / Serviço / Horário / Confirmação</h3>
+            <p class="text-muted fw-semibold mb-4">Confirme as informações do agendamento solicitado:</p>
+
+            <div class="bg-white p-4 rounded-3 shadow-sm mb-4" style="max-width: 720px;">
+              <table class="table mb-4">
+                <thead class="text-secondary">
+                  <tr>
+                    <th>Serviço</th>
+                    <th>Data</th>
+                    <th>Horário</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td id="confirmacaoServico">Sobrancelhas: Design de Sobrancelhas</td>
+                    <td id="confirmacaoData">30/04/2025</td>
+                    <td id="confirmacaoHorario">18:00</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div class="d-flex gap-3">
+                <button id="btnConfirmarAgendamento" class="btn text-white fw-semibold px-4 py-2"
+                  style="background-color: #22C55E;">
+                  Confirmar Agendamento
+                </button>
+
+                <button id="btnVoltarParaHorario" class="btn text-white fw-semibold px-4 py-2"
+                  style="background-color: #CBD5E1;">
+                  Voltar
+                </button>
+              </div>
+            </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <!-- Seção Horário de Funcionamento -->
-        <section id="sec-horario" style="display: none;">
-          <div class="container-fluid">
-            <div class="px-4">
-              <h3 class="fw-bold mb-2" style="color: #985d78;">Horário de Funcionamento</h3>
-              <p class="text-muted fw-semibold mb-4">Dias e horários de atendimento da semana</p>
+      <!-- Seção Agenda / Serviço / Horário / Confirmação / Sucesso -->
+      <section id="sec-agendamento-sucesso" style="display: none;">
+        <div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+          <div class="text-center bg-white p-5 rounded-3 shadow" style="max-width: 500px; width: 100%;">
+            <i class="fa-solid fa-circle-check mb-3" style="font-size: 80px; color: #22C55E;"></i>
+            <h2 class="fw-bold text-success mb-2">Sucesso</h2>
+            <p class="text-secondary fw-semibold">Agendamento realizado com sucesso</p>
+            <button id="btnOkSucesso" class="btn btn-light fw-bold mt-3 px-4">Ok</button>
+          </div>
+        </div>
+      </section>
 
-              <div class="bg-white p-4 rounded-3 shadow-sm w-100">
-                <!-- DOMINGO -->
-                <div class="d-flex justify-content-between align-items-center border-bottom py-2">
-                  <strong>Domingo</strong>
-                  <span class="px-4 py-2 rounded-pill fw-semibold" style="background-color: #B91C1C; color: white;">Fechado</span>
-                </div>
+      <!-- Seção Meus Agendamentos -->
+      <section id="sec-agendamentos" style="display: none">
+        <h3 class="fw-bold mb-4" style="color: #985d78">Meus Agendamentos</h3>
 
-                <!-- DIAS ÚTEIS -->
-                <div class="d-flex justify-content-between align-items-center border-bottom py-2">
-                  <strong>Segunda-feira</strong>
-                  <div class="d-flex gap-2">
-                    <span class="px-4 py-2 rounded-pill fw-semibold" style="background-color: #22C55E; color: #000;">14:00 às 17:00</span>
-                    <span class="px-4 py-2 rounded-pill fw-semibold" style="background-color: #22C55E; color: #000;">18:00 às 22:00</span>
-                  </div>
-                </div>
-                <div class="d-flex justify-content-between align-items-center border-bottom py-2">
-                  <strong>Terça-feira</strong>
-                  <div class="d-flex gap-2">
-                    <span class="px-4 py-2 rounded-pill fw-semibold" style="background-color: #22C55E; color: #000;">14:00 às 17:00</span>
-                    <span class="px-4 py-2 rounded-pill fw-semibold" style="background-color: #22C55E; color: #000;">18:00 às 22:00</span>
-                  </div>
-                </div>
-                <div class="d-flex justify-content-between align-items-center border-bottom py-2">
-                  <strong>Quarta-feira</strong>
-                  <div class="d-flex gap-2">
-                    <span class="px-4 py-2 rounded-pill fw-semibold" style="background-color: #22C55E; color: #000;">14:00 às 17:00</span>
-                    <span class="px-4 py-2 rounded-pill fw-semibold" style="background-color: #22C55E; color: #000;">18:00 às 22:00</span>
-                  </div>
-                </div>
-                <div class="d-flex justify-content-between align-items-center border-bottom py-2">
-                  <strong>Quinta-feira</strong>
-                  <div class="d-flex gap-2">
-                    <span class="px-4 py-2 rounded-pill fw-semibold" style="background-color: #22C55E; color: #000;">14:00 às 17:00</span>
-                    <span class="px-4 py-2 rounded-pill fw-semibold" style="background-color: #22C55E; color: #000;">18:00 às 22:00</span>
-                  </div>
-                </div>
-                <div class="d-flex justify-content-between align-items-center border-bottom py-2">
-                  <strong>Sexta-feira</strong>
-                  <div class="d-flex gap-2">
-                    <span class="px-4 py-2 rounded-pill fw-semibold" style="background-color: #22C55E; color: #000;">14:00 às 17:00</span>
-                    <span class="px-4 py-2 rounded-pill fw-semibold" style="background-color: #22C55E; color: #000;">18:00 às 22:00</span>
-                  </div>
-                </div>
+        <div class="bg-white rounded-3 shadow-sm p-3" style="font-family: 'Segoe UI', sans-serif">
+          <table class="table align-middle mb-0">
+            <thead>
+              <tr class="text-secondary" style="font-weight: 600">
+                <th>Serviço</th>
+                <th>Data</th>
+                <th>Horário</th>
+                <th class="text-center">Ação</th>
+              </tr>
+            </thead>
+            <tbody id="listaAgendamentos" style="font-weight: 400">
+            </tbody>
+          </table>
+        </div>
 
-                <!-- SÁBADO -->
-                <div class="d-flex justify-content-between align-items-center pt-2">
-                  <strong>Sábado</strong>
-                  <div class="d-flex gap-2">
-                    <span class="px-4 py-2 rounded-pill fw-semibold" style="background-color: #22C55E; color: #000;">09:00 às 12:00</span>
-                    <span class="px-4 py-2 rounded-pill fw-semibold" style="background-color: #22C55E; color: #000;">13:00 às 18:00</span>
-                  </div>
+        <div class="text-end mt-4">
+          <button id="btnNovoAgendamento" class="btn text-white px-4 py-2 fw-semibold" style="background-color: #985d78"
+            aria-label="Botão para realizar novo agendamento">
+            + Novo Agendamento
+          </button>
+        </div>
+      </section>
+
+      <!-- Seção de detalhes do agendamento -->
+      <section id="sec-agendamento-detalhe" style="display: none;">
+        <div class="container-fluid">
+          <div class="px-4">
+            <h3 class="fw-bold mb-3" style="color: #985d78">Meus Agendamentos / Editar</h3>
+            <p class="text-muted fw-semibold mb-3">Informações do agendamento:</p>
+
+            <div class="bg-white p-4 rounded-3 shadow-sm mb-4" style="max-width: 720px;">
+              <table class="table mb-0">
+                <thead class="text-secondary">
+                  <tr>
+                    <th>Serviço</th>
+                    <th>Data</th>
+                    <th>Horário</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td id="detalheServico"></td>
+                    <td id="detalheData"></td>
+                    <td id="detalheHorario"></td>
+                    <td id="detalheStatus"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="d-flex gap-2">
+              <button id="btnExcluirAgendamento" class="btn fw-bold text-white" style="background-color: #dc2626;">
+                Excluir Agendamento
+              </button>
+              <button id="btnVoltarAgendamento" class="btn fw-bold text-white" style="background-color: #cbd5e1;">
+                Voltar
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Seção Serviços -->
+      <section id="sec-servicos" style="display: none;">
+        <h3 class="fw-bold mb-4" style="color: #985d78">Serviços</h3>
+
+        <div class="bg-white p-4 rounded-3 shadow-sm mb-4">
+          <h5 class="fw-semibold mb-3" style="color: #985d78;">Cílios (tempo médio 2 horas)</h5>
+          <table class="table table-borderless align-middle mb-0">
+            <thead class="text-secondary">
+              <tr style="font-weight: 600;">
+                <th>Serviço</th>
+                <th>1ª Aplicação</th>
+                <th>Manutenção</th>
+              </tr>
+            </thead>
+            <tbody style="font-weight: 400;">
+              <tr>
+                <td>Volume Brasileiro</td>
+                <td>R$ 90,00</td>
+                <td>R$ 70,00</td>
+              </tr>
+              <tr>
+                <td>Efeito Fox</td>
+                <td>R$ 100,00</td>
+                <td>R$ 80,00</td>
+              </tr>
+              <tr>
+                <td>Efeito Molhado</td>
+                <td>R$ 90,00</td>
+                <td>R$ 70,00</td>
+              </tr>
+              <tr>
+                <td>Volume 5D</td>
+                <td>R$ 100,00</td>
+                <td>R$ 80,00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="bg-white p-4 rounded-3 shadow-sm">
+          <h5 class="fw-semibold mb-3" style="color: #985d78;">Sobrancelhas</h5>
+          <table class="table table-borderless align-middle mb-0">
+            <thead class="text-secondary">
+              <tr style="font-weight: 600;">
+                <th>Serviço</th>
+                <th>Valor</th>
+                <th>Tempo</th>
+              </tr>
+            </thead>
+            <tbody style="font-weight: 400;">
+              <tr>
+                <td>Design de Sobrancelhas</td>
+                <td>R$ 25,00</td>
+                <td>30 Minutos</td>
+              </tr>
+              <tr>
+                <td>Design com Henna</td>
+                <td>R$ 35,00</td>
+                <td>45 Minutos</td>
+              </tr>
+              <tr>
+                <td>Brown Lamination</td>
+                <td>R$ 60,00</td>
+                <td>1 Hora</td>
+              </tr>
+              <tr>
+                <td>Lash Lifting</td>
+                <td>R$ 60,00</td>
+                <td>1 Hora</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Seção Horário de Funcionamento -->
+      <section id="sec-horario" style="display: none;">
+        <div class="container-fluid">
+          <div class="px-4">
+            <h3 class="fw-bold mb-2" style="color: #985d78;">Horário de Funcionamento</h3>
+            <p class="text-muted fw-semibold mb-4">Dias e horários de atendimento da semana</p>
+
+            <div class="bg-white p-4 rounded-3 shadow-sm w-100">
+              <!-- DOMINGO -->
+              <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                <strong>Domingo</strong>
+                <span class="px-4 py-2 rounded-pill fw-semibold"
+                  style="background-color: #B91C1C; color: white;">Fechado</span>
+              </div>
+
+              <!-- DIAS ÚTEIS -->
+              <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                <strong>Segunda-feira</strong>
+                <div class="d-flex gap-2">
+                  <span class="px-4 py-2 rounded-pill fw-semibold" style="background-color: #22C55E; color: #000;">14:00
+                    às 17:00</span>
+                  <span class="px-4 py-2 rounded-pill fw-semibold" style="background-color: #22C55E; color: #000;">18:00
+                    às 22:00</span>
+                </div>
+              </div>
+              <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                <strong>Terça-feira</strong>
+                <div class="d-flex gap-2">
+                  <span class="px-4 py-2 rounded-pill fw-semibold" style="background-color: #22C55E; color: #000;">14:00
+                    às 17:00</span>
+                  <span class="px-4 py-2 rounded-pill fw-semibold" style="background-color: #22C55E; color: #000;">18:00
+                    às 22:00</span>
+                </div>
+              </div>
+              <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                <strong>Quarta-feira</strong>
+                <div class="d-flex gap-2">
+                  <span class="px-4 py-2 rounded-pill fw-semibold" style="background-color: #22C55E; color: #000;">14:00
+                    às 17:00</span>
+                  <span class="px-4 py-2 rounded-pill fw-semibold" style="background-color: #22C55E; color: #000;">18:00
+                    às 22:00</span>
+                </div>
+              </div>
+              <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                <strong>Quinta-feira</strong>
+                <div class="d-flex gap-2">
+                  <span class="px-4 py-2 rounded-pill fw-semibold" style="background-color: #22C55E; color: #000;">14:00
+                    às 17:00</span>
+                  <span class="px-4 py-2 rounded-pill fw-semibold" style="background-color: #22C55E; color: #000;">18:00
+                    às 22:00</span>
+                </div>
+              </div>
+              <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                <strong>Sexta-feira</strong>
+                <div class="d-flex gap-2">
+                  <span class="px-4 py-2 rounded-pill fw-semibold" style="background-color: #22C55E; color: #000;">14:00
+                    às 17:00</span>
+                  <span class="px-4 py-2 rounded-pill fw-semibold" style="background-color: #22C55E; color: #000;">18:00
+                    às 22:00</span>
+                </div>
+              </div>
+
+              <!-- SÁBADO -->
+              <div class="d-flex justify-content-between align-items-center pt-2">
+                <strong>Sábado</strong>
+                <div class="d-flex gap-2">
+                  <span class="px-4 py-2 rounded-pill fw-semibold" style="background-color: #22C55E; color: #000;">09:00
+                    às 12:00</span>
+                  <span class="px-4 py-2 rounded-pill fw-semibold" style="background-color: #22C55E; color: #000;">13:00
+                    às 18:00</span>
                 </div>
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <!-- Seção Meu Perfil -->
-        <section id="sec-perfil" style="display: none;">
-          <div class="container-fluid">
-            <div class="row">
-              <div class="col">
-                <h3 class="fw-bold mb-4" style="color: #985D78;">Meu Perfil</h3>
+      <!-- Seção Meu Perfil -->
+      <section id="sec-perfil" style="display: none;">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col">
+              <h3 class="fw-bold mb-4" style="color: #985D78;">Meu Perfil</h3>
 
-                <div class="bg-white p-4 rounded-3 shadow-sm w-100" style="max-width: 1000px;">
-                  <div class="row mb-3">
-                    <div class="col-md-2 fw-semibold">Nome:</div>
-                    <div class="col-md-10">Maria da Silva Costa</div>
-                  </div>
-
-                  <div class="row mb-3">
-                    <div class="col-md-2 fw-semibold">E-mail:</div>
-                    <div class="col-md-10">maria.costa@gmail.com</div>
-                  </div>
-
-                  <div class="row mb-3">
-                    <div class="col-md-2 fw-semibold">Telefone:</div>
-                    <div class="col-md-10">(11) 98520-5216</div>
-                  </div>
+              <div class="bg-white p-4 rounded-3 shadow-sm w-100" style="max-width: 1000px;">
+                <div class="row mb-3">
+                  <div class="col-md-2 fw-semibold">Nome:</div>
+                  <div class="col-md-10">Maria da Silva Costa</div>
                 </div>
 
-                <div class="text-end mt-3" style="max-width: 1000px;">
-                  <button id="btnEditarPerfil" class="btn fw-semibold text-white px-4 py-2" style="background-color: #985D78;">
-                    Alterar Dados do Perfil
-                  </button>
+                <div class="row mb-3">
+                  <div class="col-md-2 fw-semibold">E-mail:</div>
+                  <div class="col-md-10">maria.costa@gmail.com</div>
                 </div>
+
+                <div class="row mb-3">
+                  <div class="col-md-2 fw-semibold">Telefone:</div>
+                  <div class="col-md-10">(11) 98520-5216</div>
+                </div>
+              </div>
+
+              <div class="text-end mt-3" style="max-width: 1000px;">
+                <button id="btnEditarPerfil" class="btn fw-semibold text-white px-4 py-2"
+                  style="background-color: #985D78;">
+                  Alterar Dados do Perfil
+                </button>
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
       <!-- Seção Alterar Dados do Perfil -->
       <section id="sec-perfil-editar" style="display: none;">
-        <div class="d-flex justify-content-center align-items-start" style="min-height: calc(100vh - 100px); padding-top: 2rem;">
+        <div class="d-flex justify-content-center align-items-start"
+          style="min-height: calc(100vh - 100px); padding-top: 2rem;">
           <div style="width: 100%; max-width: 700px;">
             <h3 class="fw-bold mb-4" style="color: #985D78;">Meu Perfil / Alterar Dados</h3>
 
@@ -618,14 +660,14 @@
           </div>
         </div>
       </section>
-      </div>
     </div>
+  </div>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       // Navegação entre seções da sidebar
 
-        buscarAgendamentos();
+      buscarAgendamentos();
 
       document.querySelectorAll(".sidebar a[data-section]").forEach((link) => {
         link.addEventListener("click", function (e) {
@@ -848,7 +890,7 @@
         const linkAgendamentos = document.querySelector('.sidebar a[data-section="agendamentos"]');
         if (linkAgendamentos) linkAgendamentos.classList.add("active");
       });
-      
+
       // Botão "+ Novo Agendamento"
       const btnNovoAgendamento = document.getElementById("btnNovoAgendamento");
       if (btnNovoAgendamento) {
@@ -866,72 +908,72 @@
         });
       }
 
-        let agendamentos = [];
+      let agendamentos = [];
 
-  function adicionarAgendamento(servico, data, horario) {
-    const novo = { servico, data, horario, status: 'AGENDADO' };
-    agendamentos.push(novo);
-    enviarAgendamento(novo);
-    atualizarListaAgendamentos();
-  }
+      function adicionarAgendamento(servico, data, horario) {
+        const novo = { servico, data, horario, status: 'AGENDADO' };
+        agendamentos.push(novo);
+        enviarAgendamento(novo);
+        atualizarListaAgendamentos();
+      }
 
-  function atualizarListaAgendamentos() {
-  const tbody = document.getElementById("listaAgendamentos");
-  tbody.innerHTML = ""; // limpa
+      function atualizarListaAgendamentos() {
+        const tbody = document.getElementById("listaAgendamentos");
+        tbody.innerHTML = ""; // limpa
 
-  agendamentos.forEach((item, index) => {
-    const tr = document.createElement("tr");
+        agendamentos.forEach((item, index) => {
+          const tr = document.createElement("tr");
 
-    tr.innerHTML = `
+          tr.innerHTML = `
       <td>${item.servico}</td>
       <td>${item.data}</td>
       <td>${item.horario}</td>
       <td class="text-center"></td>
     `;
 
-    const btnDetalhes = document.createElement("button");
-    btnDetalhes.textContent = "Detalhes";
-    btnDetalhes.className = "btn btn-warning fw-semibold px-3";
-    btnDetalhes.setAttribute("aria-label", "Ver detalhes");
+          const btnDetalhes = document.createElement("button");
+          btnDetalhes.textContent = "Detalhes";
+          btnDetalhes.className = "btn btn-warning fw-semibold px-3";
+          btnDetalhes.setAttribute("aria-label", "Ver detalhes");
 
-    btnDetalhes.addEventListener("click", () => {
-      abrirDetalhesAgendamento(index);
-    });
+          btnDetalhes.addEventListener("click", () => {
+            abrirDetalhesAgendamento(index);
+          });
 
-    tr.querySelector("td.text-center").appendChild(btnDetalhes);
-    tbody.appendChild(tr);
-  });
-}
+          tr.querySelector("td.text-center").appendChild(btnDetalhes);
+          tbody.appendChild(tr);
+        });
+      }
 
-  function abrirDetalhesAgendamento(index) {
-    const agendamento = agendamentos[index];
-    document.getElementById("detalheServico").textContent = agendamento.servico;
-    document.getElementById("detalheData").textContent = agendamento.data;
-    document.getElementById("detalheHorario").textContent = agendamento.horario;
-    document.getElementById("detalheStatus").textContent = agendamento.status;
+      function abrirDetalhesAgendamento(index) {
+        const agendamento = agendamentos[index];
+        document.getElementById("detalheServico").textContent = agendamento.servico;
+        document.getElementById("detalheData").textContent = agendamento.data;
+        document.getElementById("detalheHorario").textContent = agendamento.horario;
+        document.getElementById("detalheStatus").textContent = agendamento.status;
 
-    // guarda qual está sendo editado
-    document.getElementById("btnExcluirAgendamento").dataset.index = index;
+        // guarda qual está sendo editado
+        document.getElementById("btnExcluirAgendamento").dataset.index = index;
 
-    // navega para tela de detalhes
-    document.querySelectorAll("section[id^='sec-']").forEach(sec => sec.style.display = "none");
-    document.getElementById("sec-agendamento-detalhe").style.display = "block";
-  }
+        // navega para tela de detalhes
+        document.querySelectorAll("section[id^='sec-']").forEach(sec => sec.style.display = "none");
+        document.getElementById("sec-agendamento-detalhe").style.display = "block";
+      }
 
-  document.getElementById("btnVoltarAgendamento").addEventListener("click", () => {
-    document.getElementById("sec-agendamento-detalhe").style.display = "none";
-    document.getElementById("sec-agendamentos").style.display = "block";
-  });
+      document.getElementById("btnVoltarAgendamento").addEventListener("click", () => {
+        document.getElementById("sec-agendamento-detalhe").style.display = "none";
+        document.getElementById("sec-agendamentos").style.display = "block";
+      });
 
-  document.getElementById("btnExcluirAgendamento").addEventListener("click", () => {
-    const index = document.getElementById("btnExcluirAgendamento").dataset.index;
-    agendamentos.splice(index, 1);
-    atualizarListaAgendamentos();
+      document.getElementById("btnExcluirAgendamento").addEventListener("click", () => {
+        const index = document.getElementById("btnExcluirAgendamento").dataset.index;
+        agendamentos.splice(index, 1);
+        atualizarListaAgendamentos();
 
-    // volta para lista
-    document.getElementById("sec-agendamento-detalhe").style.display = "none";
-    document.getElementById("sec-agendamentos").style.display = "block";
-  });
+        // volta para lista
+        document.getElementById("sec-agendamento-detalhe").style.display = "none";
+        document.getElementById("sec-agendamentos").style.display = "block";
+      });
 
       // Abrir edição do perfil
       const btnEditarPerfil = document.getElementById("btnEditarPerfil");
@@ -972,9 +1014,8 @@
 
         const nomeMes = date.toLocaleString("pt-BR", { month: "long" });
         if (monthYear) {
-          monthYear.innerHTML = `<span>${
-            nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1)
-          }</span> <span>${year}</span>`;
+          monthYear.innerHTML = `<span>${nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1)
+            }</span> <span>${year}</span>`;
         }
 
         if (!calendarBody) return;
@@ -1006,18 +1047,18 @@
           }
 
           span.addEventListener("click", () => {
-          const clickedDate = new Date(year, month, day);
-          const today = new Date();
-          today.setHours(0, 0, 0, 0); // Zera hora para comparar só a data
+            const clickedDate = new Date(year, month, day);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Zera hora para comparar só a data
 
-          if (clickedDate < today) {
-            alert("Você não pode selecionar uma data que já passou.");
-            return;
-          }
+            if (clickedDate < today) {
+              alert("Você não pode selecionar uma data que já passou.");
+              return;
+            }
 
-          selectedDate = clickedDate;
-          renderCalendar(currentDate);
-        });
+            selectedDate = clickedDate;
+            renderCalendar(currentDate);
+          });
 
           cell.appendChild(span);
           row.appendChild(cell);
@@ -1056,29 +1097,127 @@
     });
 
     function enviarAgendamento(agendamento) {
-  fetch('/api/agenda/novo', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(agendamento)
-  }).then(res => {
-    if (!res.ok) {
-      alert('Erro ao salvar agendamento');
+      fetch('/api/agenda/novo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(agendamento)
+      }).then(res => {
+        if (!res.ok) {
+          alert('Erro ao salvar agendamento');
+        }
+      }).catch(() => alert('Erro na comunicação com o servidor'));
     }
-  }).catch(() => alert('Erro na comunicação com o servidor'));
-}
 
-// Busca a lista atualizada do backend
-function buscarAgendamentos() {
-  fetch('/api/agenda/listar')
-    .then(res => res.json())
-    .then(data => {
-      agendamentos = data;
-      atualizarListaAgendamentos();
-    })
-    .catch(() => alert('Erro ao carregar agendamentos'));
-}
+    // Busca a lista atualizada do backend
+    function buscarAgendamentos() {
+      fetch('/api/agenda/listar')
+        .then(res => res.json())
+        .then(data => {
+          agendamentos = data;
+          atualizarListaAgendamentos();
+        })
+        .catch(() => alert('Erro ao carregar agendamentos'));
+    }
+
+    // Conver para texto ISO 8601
+    function converterDataTextoParaISO(dataTexto, horarioTexto) {
+      const meses = {
+        "janeiro": "01",
+        "fevereiro": "02",
+        "março": "03",
+        "abril": "04",
+        "maio": "05",
+        "junho": "06",
+        "julho": "07",
+        "agosto": "08",
+        "setembro": "09",
+        "outubro": "10",
+        "novembro": "11",
+        "dezembro": "12"
+      };
+
+      const regex = /(\d{1,2}) de (\w+) de (\d{4})/;
+      const match = dataTexto.match(regex);
+
+      if (!match) {
+        throw new Error("Formato de data inválido: " + dataTexto);
+      }
+
+      const [_, dia, mesTexto, ano] = match;
+      const mes = meses[mesTexto.toLowerCase()];
+
+      if (!mes) {
+        throw new Error("Mês inválido: " + mesTexto);
+      }
+
+      return `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}T${horarioTexto}:00`;
+    }
+
+    // TESTE
+    document.getElementById("btnConfirmarAgendamento").addEventListener("click", function () {
+      const descricaoServico = document.getElementById("confirmacaoServico").textContent.trim(); // "Sobrancelhas: Design de Sobrancelhas"
+      const dataTexto = document.getElementById("confirmacaoData").textContent.trim();           // "30/04/2025"
+      const horarioTexto = document.getElementById("confirmacaoHorario").textContent.trim();     // "18:00"
+
+      // Conversão da data e hora para formato ISO
+      const dataHora = converterDataTextoParaISO(dataTexto, horarioTexto);
+
+      console.log("dataHora:", dataHora);
+
+
+      // Mapeamento da descrição para o nome do Enum
+      const descricaoParaEnum = {
+        "Cílios: Volume brasileiro": "CILIOS_VOLUME_BRASILEIRO",
+        "Cílios: Efeito fox": "CILIOS_EFEITO_FOX",
+        "Cílios: Efeito Molhado": "CILIOS_EFEITO_MOLHADO",
+        "Cílios: Volume 5D": "CILIOS_VOLUME_5D",
+        "Sobrancelhas: Design de sobrancelhas": "SOBRANCELHAS_DESIGN",
+        "Sobrancelhas: Design com henna": "SOBRANCELHAS_DESIGN_HENNA",
+        "Sobrancelhas: Brow lamination": "SOBRANCELHAS_BROW_LAMINATION",
+        "Sobrancelhas: Lash lifting": "SOBRANCELHAS_LASH_LIFTING"
+      };
+
+      const especialidadeEnum = descricaoParaEnum[descricaoServico];
+      if (!especialidadeEnum) {
+        alert("Especialidade inválida!");
+        return;
+      }
+
+      const agendamento = {
+        data: dataHora,
+        valor: 50.0, // Substitua por valor real
+        especialidade: especialidadeEnum,
+        status: "AGENDADO",
+        cliente: { id: 1 },       // ID do cliente logado
+        profissional: { id: 2 }   // ID do profissional selecionado
+      };
+
+      fetch("/api/agenda/novo", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(agendamento)
+      })
+        .then(response => {
+          if (!response.ok) throw new Error("Erro ao agendar");
+          return response.json();
+        })
+        .then(data => {
+          alert("Agendamento confirmado com sucesso!");
+          console.log("Agendamento salvo:", data);
+        })
+        .catch(error => {
+          alert("Erro ao confirmar agendamento.");
+          console.error(error);
+        });
+    });
+
+
+
 
   </script>
 
-  </body>
+</body>
+
 </html>

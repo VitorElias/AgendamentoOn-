@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.AgendamentoOn.Enum.Status;
 import com.AgendamentoOn.Model.Agendamento;
 import com.AgendamentoOn.Repository.AgendamentoRepository;
 
@@ -56,5 +57,17 @@ public class AgendamentoService {
     public List<Agendamento> getAgendamentosByClienteId(Long clienteId) {
         return agendamentoRepository.findByClienteId(clienteId);  // Consulta personalizada
     }
+
+    public void cancelarAgendamento(Long id) {
+    Optional<Agendamento> agendamentoOpt = agendamentoRepository.findById(id);
+    if (agendamentoOpt.isPresent()) {
+        Agendamento agendamento = agendamentoOpt.get();
+        agendamento.setStatus(Status.CANCELADO);
+        agendamentoRepository.save(agendamento);
+    } else {
+        throw new RuntimeException("Agendamento não encontrado");
+    }
+}
+
     
 }

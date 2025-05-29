@@ -51,6 +51,25 @@ public class UsuarioService {
         usuarioRepository.save(usuario);
     }
 
+    @Transactional
+    public Usuario atualizar(Usuario usuarioAtualizado) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findById(usuarioAtualizado.getId());
+        if (usuarioOpt.isPresent()) {
+            Usuario usuario = usuarioOpt.get();
+            usuario.setNome(usuarioAtualizado.getNome());
+            usuario.setEmail(usuarioAtualizado.getEmail());
+            usuario.setTelefone(usuarioAtualizado.getTelefone());
+
+            if (usuarioAtualizado.getSenha() != null && !usuarioAtualizado.getSenha().isEmpty()) {
+                usuario.setSenha(passwordEncoder.encode(usuarioAtualizado.getSenha()));
+            }
+            // Alterações serão persistidas automaticamente por causa do @Transactional
+            return usuario;
+        }
+        return null;
+    }
+    
+
     public Optional<Usuario> getUsuarioPorId(Long id) {
         return usuarioRepository.findById(id);
     }

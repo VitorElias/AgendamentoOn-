@@ -418,7 +418,7 @@
 
             <div class="d-flex gap-2">
               <button id="btnExcluirAgendamento" class="btn fw-bold text-white" style="background-color: #dc2626;">
-                Excluir Agendamento
+                Cancelar Agendamento
               </button>
               <button id="btnVoltarAgendamento" class="btn fw-bold text-white" style="background-color: #cbd5e1;">
                 Voltar
@@ -581,85 +581,83 @@
       </section>
 
       <!-- Seção Meu Perfil -->
-      <section id="sec-perfil" style="display: none;">
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col">
-              <h3 class="fw-bold mb-4" style="color: #985D78;">Meu Perfil</h3>
+      <section id="sec-perfil" style="display: none;"> <!-- deixe visível -->
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col">
+        <h3 class="fw-bold mb-4" style="color: #985D78;">Meu Perfil</h3>
 
-              <div class="bg-white p-4 rounded-3 shadow-sm w-100" style="max-width: 1000px;">
-                <div class="row mb-3">
-                  <div class="col-md-2 fw-semibold">Nome:</div>
-                  <div class="col-md-10">Maria da Silva Costa</div>
-                </div>
+        <div class="bg-white p-4 rounded-3 shadow-sm w-100" style="max-width: 1000px;">
+          <div class="row mb-3">
+            <div class="col-md-2 fw-semibold">Nome:</div>
+            <div class="col-md-10" id="perfilNome">...</div>
+          </div>
 
-                <div class="row mb-3">
-                  <div class="col-md-2 fw-semibold">E-mail:</div>
-                  <div class="col-md-10">maria.costa@gmail.com</div>
-                </div>
+          <div class="row mb-3">
+            <div class="col-md-2 fw-semibold">E-mail:</div>
+            <div class="col-md-10" id="perfilEmail">...</div>
+          </div>
 
-                <div class="row mb-3">
-                  <div class="col-md-2 fw-semibold">Telefone:</div>
-                  <div class="col-md-10">(11) 98520-5216</div>
-                </div>
-              </div>
-
-              <div class="text-end mt-3" style="max-width: 1000px;">
-                <button id="btnEditarPerfil" class="btn fw-semibold text-white px-4 py-2"
-                  style="background-color: #985D78;">
-                  Alterar Dados do Perfil
-                </button>
-              </div>
-            </div>
+          <div class="row mb-3">
+            <div class="col-md-2 fw-semibold">Telefone:</div>
+            <div class="col-md-10" id="perfilTelefone">...</div>
           </div>
         </div>
-      </section>
 
-      <!-- Seção Alterar Dados do Perfil -->
-      <section id="sec-perfil-editar" style="display: none;">
-        <div class="d-flex justify-content-center align-items-start"
-          style="min-height: calc(100vh - 100px); padding-top: 2rem;">
-          <div style="width: 100%; max-width: 700px;">
-            <h3 class="fw-bold mb-4" style="color: #985D78;">Meu Perfil / Alterar Dados</h3>
-
-            <div class="bg-white p-4 rounded-3 shadow-sm">
-              <div class="mb-3">
-                <label class="form-label fw-semibold">Nome</label>
-                <input type="text" class="form-control" placeholder="Digite seu nome" />
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label fw-semibold">E-mail</label>
-                <input type="email" class="form-control" placeholder="Digite seu e-mail" />
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label fw-semibold">Senha</label>
-                <input type="password" class="form-control" placeholder="Senha deve ter no mínimo 8 caracteres" />
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label fw-semibold">Confirme a senha</label>
-                <input type="password" class="form-control" placeholder="Digite novamente sua senha" />
-              </div>
-
-              <div class="mb-4">
-                <label class="form-label fw-semibold">Telefone</label>
-                <input type="text" class="form-control" placeholder="(DDD) 91234-5678" />
-              </div>
-
-              <div class="d-flex gap-2">
-                <button class="btn w-100 fw-bold text-white" style="background-color: #22C55E;">
-                  Atualizar Dados do Perfil
-                </button>
-                <button id="btnVoltarPerfil" class="btn w-100 fw-bold text-white" style="background-color: #cbd5e1;">
-                  Voltar
-                </button>
-              </div>
-            </div>
-          </div>
+        <div class="text-end mt-3" style="max-width: 1000px;">
+          <button id="btnEditarPerfil" class="btn fw-semibold text-white px-4 py-2" style="background-color: #985D78;">
+            Alterar Dados do Perfil
+          </button>
         </div>
-      </section>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Seção Alterar Dados do Perfil -->
+<section id="sec-perfil-editar" style="display: none;">
+  <div class="d-flex justify-content-center align-items-start" style="min-height: calc(100vh - 100px); padding-top: 2rem;">
+    <div style="width: 100%; max-width: 700px;">
+      <h3 class="fw-bold mb-4" style="color: #985D78;">Meu Perfil / Alterar Dados</h3>
+
+      <div class="bg-white p-4 rounded-3 shadow-sm">
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="inputNome">Nome</label>
+          <input type="text" id="inputNome" class="form-control" placeholder="Digite seu nome" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="inputEmail">E-mail</label>
+          <input type="email" id="inputEmail" class="form-control" placeholder="Digite seu e-mail" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="inputSenha">Senha</label>
+          <input type="password" id="inputSenha" class="form-control" placeholder="Senha deve ter no mínimo 8 caracteres" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="inputConfirmaSenha">Confirme a senha</label>
+          <input type="password" id="inputConfirmaSenha" class="form-control" placeholder="Digite novamente sua senha" />
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label fw-semibold" for="inputTelefone">Telefone</label>
+          <input type="text" id="inputTelefone" class="form-control" placeholder="(DDD) 91234-5678" />
+        </div>
+
+        <div class="d-flex gap-2">
+          <button id="btnAtualizarPerfil" class="btn w-100 fw-bold text-white" style="background-color: #22C55E;">
+            Atualizar Dados do Perfil
+          </button>
+          <button id="btnVoltarPerfil" class="btn w-100 fw-bold text-white" style="background-color: #cbd5e1;">
+            Voltar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
     </div>
   </div>
 
@@ -917,85 +915,8 @@
         atualizarListaAgendamentos();
       }
 
-      function atualizarListaAgendamentos() {
-        const tbody = document.getElementById("listaAgendamentos");
-        tbody.innerHTML = ""; // limpa
 
-        agendamentos.forEach((item, index) => {
-          const tr = document.createElement("tr");
-
-          tr.innerHTML = `
-      <td>${item.servico}</td>
-      <td>${item.data}</td>
-      <td>${item.horario}</td>
-      <td class="text-center"></td>
-    `;
-
-          const btnDetalhes = document.createElement("button");
-          btnDetalhes.textContent = "Detalhes";
-          btnDetalhes.className = "btn btn-warning fw-semibold px-3";
-          btnDetalhes.setAttribute("aria-label", "Ver detalhes");
-
-          btnDetalhes.addEventListener("click", () => {
-            abrirDetalhesAgendamento(index);
-          });
-
-          tr.querySelector("td.text-center").appendChild(btnDetalhes);
-          tbody.appendChild(tr);
-        });
-      }
-
-      function abrirDetalhesAgendamento(index) {
-        const agendamento = agendamentos[index];
-        document.getElementById("detalheServico").textContent = agendamento.servico;
-        document.getElementById("detalheData").textContent = agendamento.data;
-        document.getElementById("detalheHorario").textContent = agendamento.horario;
-        document.getElementById("detalheStatus").textContent = agendamento.status;
-
-        // guarda qual está sendo editado
-        document.getElementById("btnExcluirAgendamento").dataset.index = index;
-
-        // navega para tela de detalhes
-        document.querySelectorAll("section[id^='sec-']").forEach(sec => sec.style.display = "none");
-        document.getElementById("sec-agendamento-detalhe").style.display = "block";
-      }
-
-      document.getElementById("btnVoltarAgendamento").addEventListener("click", () => {
-        document.getElementById("sec-agendamento-detalhe").style.display = "none";
-        document.getElementById("sec-agendamentos").style.display = "block";
-      });
-
-      document.getElementById("btnExcluirAgendamento").addEventListener("click", () => {
-        const index = document.getElementById("btnExcluirAgendamento").dataset.index;
-        agendamentos.splice(index, 1);
-        atualizarListaAgendamentos();
-
-        // volta para lista
-        document.getElementById("sec-agendamento-detalhe").style.display = "none";
-        document.getElementById("sec-agendamentos").style.display = "block";
-      });
-
-      // Abrir edição do perfil
-      const btnEditarPerfil = document.getElementById("btnEditarPerfil");
-      if (btnEditarPerfil) {
-        btnEditarPerfil.addEventListener("click", () => {
-          document
-            .querySelectorAll("section[id^='sec-']")
-            .forEach((sec) => (sec.style.display = "none"));
-          document.getElementById("sec-perfil-editar").style.display = "block";
-        });
-      }
-
-      // Voltar para a visualização do perfil
-      const btnVoltarPerfil = document.getElementById("btnVoltarPerfil");
-      if (btnVoltarPerfil) {
-        btnVoltarPerfil.addEventListener("click", () => {
-          document
-            .querySelectorAll("section[id^='sec-']")
-            .forEach((sec) => (sec.style.display = "none"));
-          document.getElementById("sec-perfil").style.display = "block";
-        });
-      }
+     
 
       // Calendário
       const calendarBody = document.getElementById("calendarBody");
@@ -1110,110 +1031,300 @@
 
     // Busca a lista atualizada do backend
     function buscarAgendamentos() {
-      fetch('/api/agenda/listar')
-        .then(res => res.json())
-        .then(data => {
-          agendamentos = data;
-          atualizarListaAgendamentos();
-        })
-        .catch(() => alert('Erro ao carregar agendamentos'));
-    }
+  fetch('/api/agenda/listar')
+    .then(res => {
+      console.log("Status HTTP:", res.status);
+      if (!res.ok) {
+        throw new Error(`HTTP status ${res.status}`);
+      }
+      return res.json();
+    })
+    .then(data => {
+      console.log("Dados recebidos:", data);
+      agendamentos = data;
+      atualizarListaAgendamentos();
+    })
+    .catch(err => {
+      console.error("Erro detalhado ao carregar agendamentos:", err);
+      alert('Erro ao carregar agendamentos: ' + err.message);
+    });
+}
 
-    // Conver para texto ISO 8601
+
     function converterDataTextoParaISO(dataTexto, horarioTexto) {
-      const meses = {
-        "janeiro": "01",
-        "fevereiro": "02",
-        "março": "03",
-        "abril": "04",
-        "maio": "05",
-        "junho": "06",
-        "julho": "07",
-        "agosto": "08",
-        "setembro": "09",
-        "outubro": "10",
-        "novembro": "11",
-        "dezembro": "12"
-      };
+  const meses = {
+    "janeiro": "01",
+    "fevereiro": "02",
+    "março": "03",
+    "abril": "04",
+    "maio": "05",
+    "junho": "06",
+    "julho": "07",
+    "agosto": "08",
+    "setembro": "09",
+    "outubro": "10",
+    "novembro": "11",
+    "dezembro": "12"
+  };
 
-      const regex = /(\d{1,2}) de (\w+) de (\d{4})/;
-      const match = dataTexto.match(regex);
+  const regex = /(\d{1,2}) de (\w+) de (\d{4})/;
+  const match = dataTexto.match(regex);
 
-      if (!match) {
-        throw new Error("Formato de data inválido: " + dataTexto);
-      }
+  if (!match) {
+    throw new Error("Formato de data inválido: " + dataTexto);
+  }
 
-      const [_, dia, mesTexto, ano] = match;
-      const mes = meses[mesTexto.toLowerCase()];
+  const [_, dia, mesTexto, ano] = match;
+  const mes = meses[mesTexto.toLowerCase()];
 
-      if (!mes) {
-        throw new Error("Mês inválido: " + mesTexto);
-      }
+  if (!mes) {
+    throw new Error("Mês inválido: " + mesTexto);
+  }
 
-      return `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}T${horarioTexto}:00`;
-    }
+  return `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}T${horarioTexto}:00`;
+}
 
-    // TESTE
-    document.getElementById("btnConfirmarAgendamento").addEventListener("click", function () {
-      const descricaoServico = document.getElementById("confirmacaoServico").textContent.trim(); // "Sobrancelhas: Design de Sobrancelhas"
-      const dataTexto = document.getElementById("confirmacaoData").textContent.trim();           // "30/04/2025"
-      const horarioTexto = document.getElementById("confirmacaoHorario").textContent.trim();     // "18:00"
+document.getElementById("btnConfirmarAgendamento").addEventListener("click", function () {
+  const descricaoServico = document.getElementById("confirmacaoServico").textContent.trim();
+  const dataTexto = document.getElementById("confirmacaoData").textContent.trim();
+  const horarioTexto = document.getElementById("confirmacaoHorario").textContent.trim();
 
-      // Conversão da data e hora para formato ISO
-      const dataHora = converterDataTextoParaISO(dataTexto, horarioTexto);
+  // Conversão da data e hora para formato ISO
+  const dataHora = converterDataTextoParaISO(dataTexto, horarioTexto);
+  console.log("dataHora:", dataHora);
 
-      console.log("dataHora:", dataHora);
+  // Exemplo de objeto que vai para o backend
+  const agendamento = {
+    data: dataHora,
+    valor: 50.0, // Pode pegar dinamicamente se quiser
+    especialidade: "SOBRANCELHAS_DESIGN", // Ajustar conforme sua lógica
+    status: "AGENDADO",
+    cliente: { id: 1 },  // pegar dinamicamente
+    profissional: { id: 2 } // pegar dinamicamente
+  };
+
+  fetch("/api/agenda/novo", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(agendamento)
+  })
+  .then(response => {
+    if (!response.ok) throw new Error("Erro ao agendar");
+    return response.json();
+  })
+  .then(data => {
+    alert("Agendamento confirmado com sucesso!");
+    console.log("Agendamento salvo:", data);
+  })
+  .catch(error => {
+    alert("Erro ao confirmar agendamento.");
+    console.error(error);
+  });
+});
 
 
-      // Mapeamento da descrição para o nome do Enum
-      const descricaoParaEnum = {
-        "Cílios: Volume brasileiro": "CILIOS_VOLUME_BRASILEIRO",
-        "Cílios: Efeito fox": "CILIOS_EFEITO_FOX",
-        "Cílios: Efeito Molhado": "CILIOS_EFEITO_MOLHADO",
-        "Cílios: Volume 5D": "CILIOS_VOLUME_5D",
-        "Sobrancelhas: Design de sobrancelhas": "SOBRANCELHAS_DESIGN",
-        "Sobrancelhas: Design com henna": "SOBRANCELHAS_DESIGN_HENNA",
-        "Sobrancelhas: Brow lamination": "SOBRANCELHAS_BROW_LAMINATION",
-        "Sobrancelhas: Lash lifting": "SOBRANCELHAS_LASH_LIFTING"
-      };
+const ESPECIALIDADE_MAPA = {
+  "CILIOS_VOLUME_BRASILEIRO": "Cílios: Volume brasileiro",
+  "CILIOS_EFEITO_FOX": "Cílios: Efeito fox",
+  "CILIOS_EFEITO_MOLHADO": "Cílios: Efeito Molhado",
+  "CILIOS_VOLUME_5D": "Cílios: Volume 5D",
+  "SOBRANCELHAS_DESIGN": "Sobrancelhas: Design de sobrancelhas",
+  "SOBRANCELHAS_DESIGN_HENNA": "Sobrancelhas: Design com henna",
+  "SOBRANCELHAS_BROW_LAMINATION": "Sobrancelhas: Brow lamination",
+  "SOBRANCELHAS_LASH_LIFTING": "Sobrancelhas: Lash lifting"
+};
 
-      const especialidadeEnum = descricaoParaEnum[descricaoServico];
-      if (!especialidadeEnum) {
-        alert("Especialidade inválida!");
-        return;
-      }
+function atualizarListaAgendamentos() {
+  const tbody = document.getElementById("listaAgendamentos");
+  tbody.innerHTML = "";
 
-      const agendamento = {
-        data: dataHora,
-        valor: 50.0, // Substitua por valor real
-        especialidade: especialidadeEnum,
-        status: "AGENDADO",
-        cliente: { id: 1 },       // ID do cliente logado
-        profissional: { id: 2 }   // ID do profissional selecionado
-      };
+  agendamentos.forEach((item, index) => {
+    const dataObj = new Date(item.data);
+    const dataFormatada = dataObj.toLocaleDateString();
+    const horaFormatada = dataObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-      fetch("/api/agenda/novo", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(agendamento)
-      })
-        .then(response => {
-          if (!response.ok) throw new Error("Erro ao agendar");
-          return response.json();
-        })
-        .then(data => {
-          alert("Agendamento confirmado com sucesso!");
-          console.log("Agendamento salvo:", data);
-        })
-        .catch(error => {
-          alert("Erro ao confirmar agendamento.");
-          console.error(error);
-        });
+    const nomeEspecialidade = ESPECIALIDADE_MAPA[item.especialidade] ?? "Especialidade não informada";
+
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>${nomeEspecialidade}</td>
+      <td>${dataFormatada}</td>
+      <td>${horaFormatada}</td>
+      <td class="text-center"></td>
+    `;
+
+    const btnDetalhes = document.createElement("button");
+    btnDetalhes.textContent = "Detalhes";
+    btnDetalhes.className = "btn btn-warning fw-semibold px-3";
+    btnDetalhes.setAttribute("aria-label", "Ver detalhes");
+
+    btnDetalhes.addEventListener("click", () => {
+      abrirDetalhesAgendamento(index);
     });
 
+    tr.querySelector("td.text-center").appendChild(btnDetalhes);
+    tbody.appendChild(tr);
+  });
+}
 
+document.getElementById("btnExcluirAgendamento").addEventListener("click", () => {
+  const index = document.getElementById("btnExcluirAgendamento").dataset.index;
+  if (index !== undefined && agendamentos[index]) {
+    const agendamentoId = agendamentos[index].id;
+
+    fetch(`/api/agenda/${agendamentoId}/cancelar`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ status: "CANCELADO" })
+    })
+    .then(response => {
+      if (!response.ok) throw new Error("Erro ao cancelar agendamento");
+      return response.json();
+    })
+    .then(() => {
+      alert("Agendamento cancelado com sucesso!");
+      location.reload();  // <<< recarrega a página inteira
+    })
+    .catch(error => {
+      console.error(error);
+      alert("Falha ao cancelar o agendamento.");
+    });
+  }
+});
+
+// Evento para voltar da tela de detalhes para lista (executa uma vez)
+document.getElementById("btnVoltarAgendamento").addEventListener("click", () => {
+  document.getElementById("sec-agendamento-detalhe").style.display = "none";
+  document.getElementById("sec-agendamentos").style.display = "block";
+});
+
+// Função para abrir detalhes, atualiza elementos e seta o índice no botão cancelar
+function abrirDetalhesAgendamento(index) {
+  const agendamento = agendamentos[index];
+
+  const nomeEspecialidade = ESPECIALIDADE_MAPA[agendamento.especialidade] ?? "Especialidade não informada";
+
+  const dataObj = new Date(agendamento.data);
+  const dataFormatada = dataObj.toLocaleDateString();
+  const horaFormatada = dataObj.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+  document.getElementById("detalheServico").textContent = nomeEspecialidade;
+  document.getElementById("detalheData").textContent = dataFormatada;
+  document.getElementById("detalheHorario").textContent = horaFormatada;
+  document.getElementById("detalheStatus").textContent = agendamento.status ?? "Status não informado";
+
+  // Seta índice para botão cancelar
+  document.getElementById("btnExcluirAgendamento").dataset.index = index;
+
+  // Mostra tela de detalhes e esconde as outras
+  document.querySelectorAll("section[id^='sec-']").forEach(sec => sec.style.display = "none");
+  document.getElementById("sec-agendamento-detalhe").style.display = "block";
+}
+
+      
+let usuarioPerfil = {};
+
+// Função para carregar e exibir o perfil
+function carregarPerfil() {
+  fetch('/api/agenda/usuario/perfil', { cache: "no-store" })
+    .then(res => {
+      if (!res.ok) throw new Error('Erro ao carregar perfil');
+      return res.json();
+    })
+    .then(data => {
+      console.log('Dados recebidos no carregarPerfil:', data);
+      usuarioPerfil = data;
+
+      // Atualiza visualização
+      document.getElementById('perfilNome').textContent = usuarioPerfil.nome || "";
+      document.getElementById('perfilEmail').textContent = usuarioPerfil.email || "";
+      document.getElementById('perfilTelefone').textContent = usuarioPerfil.telefone || "";
+    })
+    .catch(err => {
+      console.error('Erro ao carregar perfil:', err);
+      alert('Erro ao carregar perfil.');
+    });
+}
+
+// Abrir tela de edição com dados atualizados
+document.getElementById('btnEditarPerfil').addEventListener('click', () => {
+  document.getElementById('sec-perfil').style.display = 'none';
+  document.getElementById('sec-perfil-editar').style.display = 'block';
+
+  // Preenche campos com os dados mais recentes
+  document.getElementById('inputNome').value = usuarioPerfil.nome || "";
+  document.getElementById('inputEmail').value = usuarioPerfil.email || "";
+  document.getElementById('inputTelefone').value = usuarioPerfil.telefone || "";
+
+  // Limpa senhas
+  document.getElementById('inputSenha').value = "";
+  document.getElementById('inputConfirmaSenha').value = "";
+});
+
+// Voltar para visualização
+document.getElementById('btnVoltarPerfil').addEventListener('click', () => {
+  document.getElementById('sec-perfil-editar').style.display = 'none';
+  document.getElementById('sec-perfil').style.display = 'block';
+});
+
+// Atualizar perfil
+document.getElementById('btnAtualizarPerfil').addEventListener('click', () => {
+  const nome = document.getElementById('inputNome').value.trim();
+  const email = document.getElementById('inputEmail').value.trim();
+  const senha = document.getElementById('inputSenha').value;
+  const confirmaSenha = document.getElementById('inputConfirmaSenha').value;
+  const telefone = document.getElementById('inputTelefone').value.trim();
+
+  if (senha && senha.length < 8) {
+    alert("Senha deve ter no mínimo 8 caracteres");
+    return;
+  }
+
+  if (senha !== confirmaSenha) {
+    alert("As senhas não coincidem!");
+    return;
+  }
+
+  const dadosAtualizados = { nome, email, telefone };
+  if (senha) dadosAtualizados.senha = senha;
+
+  fetch('/api/agenda/usuario/perfil', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(dadosAtualizados)
+  })
+    .then(res => {
+      if (!res.ok) throw new Error('Erro ao atualizar perfil');
+      return res.json();
+    })
+    .then(data => {
+  alert('Perfil atualizado com sucesso!');
+  usuarioPerfil = data;
+
+  // Atualiza direto os elementos visuais:
+  document.getElementById('perfilNome').textContent = usuarioPerfil.nome;
+  document.getElementById('perfilEmail').textContent = usuarioPerfil.email;
+  document.getElementById('perfilTelefone').textContent = usuarioPerfil.telefone;
+
+  // Volta para visualização
+  document.getElementById('sec-perfil-editar').style.display = 'none';
+  document.getElementById('sec-perfil').style.display = 'block';
+})
+    .catch(err => {
+      console.error('Erro ao atualizar perfil:', err);
+      alert('Erro ao atualizar perfil: ' + err.message);
+    });
+});
+
+// Carregar o perfil ao iniciar
+carregarPerfil();
 
 
   </script>

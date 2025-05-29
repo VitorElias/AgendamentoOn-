@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.AgendamentoOn.Enum.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -46,6 +47,7 @@ public class Usuario {
     private Role role;
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Agendamento> agendamentos = new ArrayList<>();
 
     public Usuario() {

@@ -19,10 +19,7 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     
     List<Agendamento> findByClienteId(Long id);
     
-    List<Agendamento> findByProfissional(Usuario profissional);
-
     // Modifique para utilizar o enum Status em vez de String
     List<Agendamento> findByClienteAndStatus(Usuario cliente, Status status);
     
-    List<Agendamento> findByProfissionalAndStatus(Usuario profissional, Status status);
 }

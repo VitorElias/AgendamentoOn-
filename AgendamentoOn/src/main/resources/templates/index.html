@@ -21,7 +21,9 @@
         Com o objetivo de automatizar e otimizar o processo de agendamento permitindo que clientes agendem
         atendimentos de forma independente, sem a necessidade de contato direto com a profissional.
       </p>
-      <a th:href="@{/api/agenda}" class="btn btn-main mt-3">Agendar horário</a>
+      <a sec:authorize="hasRole('CLIENTE')" th:href="@{/api/agenda}" class="btn btn-main mt-3">Agendar horário</a>
+      <a sec:authorize="hasRole('ADMINISTRADOR')" th:href="@{/agenda-admin}" class="btn btn-main mt-3">Área do Administrador</a>
+      <a sec:authorize="isAnonymous()" th:href="@{/login}" class="btn btn-main mt-3">Login</a>
     </div>
   </div>
 </body>

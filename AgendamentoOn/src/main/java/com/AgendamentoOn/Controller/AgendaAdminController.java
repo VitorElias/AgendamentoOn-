@@ -1,94 +1,218 @@
 package com.AgendamentoOn.Controller;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.AgendamentoOn.Enum.Especialidade;
 import com.AgendamentoOn.Model.Agendamento;
+import com.AgendamentoOn.Model.Usuario;
+import com.AgendamentoOn.Security.CustomUserDetails;
 import com.AgendamentoOn.Service.AgendamentoService;
+import com.AgendamentoOn.Service.UsuarioService;
 
-@RestController
-@RequestMapping("/api/admin")
+@Controller
 public class AgendaAdminController {
 
+    private final UsuarioService usuarioService;
     private final AgendamentoService agendamentoService;
 
-    @Autowired
-    public AgendaAdminController(AgendamentoService agendamentoService) {
+    public AgendaAdminController(UsuarioService usuarioService, AgendamentoService agendamentoService) {
+        this.usuarioService = usuarioService;
         this.agendamentoService = agendamentoService;
     }
 
-    // ✅ Serve a página HTML de administração
-    @GetMapping("/agenda")
-    public String mostrarPaginaAgenda() {
-        System.out.println("Requisição GET para página de administração da agenda");
-        return "agendaAdmin";  // agendaAdmin.html em src/main/resources/templates
+    // Método que retorna página HTML
+    @GetMapping("/agenda-admin")
+    public String carregarTelaAgendaAdmin() {
+        return "agendaAdmin"; // Nome da view HTML (Thymeleaf, JSP etc)
     }
 
-    // ✅ Listar todos os agendamentos
-    @GetMapping
-    public ResponseEntity<List<Agendamento>> listarTodos() {
-        List<Agendamento> agendamentos = agendamentoService.getAllAgendamentos();
-        System.out.println("Listando todos os agendamentos, total = " + agendamentos.size());
-        return ResponseEntity.ok(agendamentos);
+    // Método que retorna JSON - usuario logado
+    @GetMapping("/api/usuario-logado")
+    @ResponseBody
+    public Usuario getUsuarioLogado(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return null;
+        }
+        Usuario usuario = userDetails.getUsuario();
+        usuario.setSenha(null);
+        return usuario;
     }
 
+    @GetMapping("/api/admin/agendamentos/todos")
+@ResponseBody
+public List<Agendamento> listarTodosAgendamentos() {
+    return agendamentoService.listarTodos();
+}
 
-    // ✅ Criar um novo agendamento
-    @PostMapping
-    public ResponseEntity<?> criar(@RequestBody Agendamento agendamento) {
-        try {
-            Agendamento salvo = agendamentoService.saveAgendamento(agendamento);
-            System.out.println("Novo agendamento criado com ID: " + salvo.getId());
-            return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao criar agendamento");
+    @PutMapping("/usuario-logado")
+@ResponseBody
+public ResponseEntity<Usuario> atualizarUsuarioLogado(
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @RequestBody Usuario dadosAtualizados) {
+
+    if (userDetails == null) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    Long usuarioId = userDetails.getUsuario().getId();
+    Usuario usuarioAtualizado = usuarioService.atualizarUsuarioLogado(usuarioId, dadosAtualizados);
+    usuarioAtualizado.setSenha(null);
+    return ResponseEntity.ok(usuarioAtualizado);
+}
+
+    @GetMapping("/api/admin/agendamentos")
+@ResponseBody
+public List<Agendamento> listarAgendamentosUltimos30Dias() {
+    List<Agendamento> agendamentos = agendamentoService.listarAgendamentosUltimos30Dias();
+
+    // Verificar duplicados por id
+    Set<Long> idsVistos = new HashSet<>();
+    Set<Long> idsDuplicados = new HashSet<>();
+
+    for (Agendamento ag : agendamentos) {
+        Long id = ag.getId();
+        if (!idsVistos.add(id)) {
+            idsDuplicados.add(id);
         }
     }
 
-    // ✅ Atualizar um agendamento existente
-    @PutMapping("/{id}")
-    public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody Agendamento agendamento) {
-        try {
-            Agendamento atualizado = agendamentoService.updateAgendamento(id, agendamento);
-            if (atualizado != null) {
-                System.out.println("Agendamento atualizado ID: " + id);
-                return ResponseEntity.ok(atualizado);
-            } else {
-                System.out.println("Agendamento não encontrado para atualização ID: " + id);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Agendamento não encontrado");
+    if (!idsDuplicados.isEmpty()) {
+        System.out.println("Duplicados encontrados nos agendamentos para IDs: " + idsDuplicados);
+    } else {
+        System.out.println("Nenhum duplicado encontrado nos agendamentos.");
+    }
+
+    return agendamentos;
+}
+
+    // Listar clientes - JSON
+    @GetMapping("/api/admin/clientes")
+    @ResponseBody
+    public List<Usuario> listarTodosClientes() {
+        return usuarioService.buscarTodosClientes();
+    }
+
+    // Outro endpoint JSON para usuario via Authentication
+    @GetMapping("/api/admin/me")
+    @ResponseBody
+    public ResponseEntity<?> getUsuarioLogadoViaAuth(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String email = authentication.getName();
+        Optional<Usuario> usuarioOpt = usuarioService.findByEmail(email);
+
+        if (usuarioOpt.isPresent()) {
+            Usuario usuario = usuarioOpt.get();
+            usuario.setSenha(null);
+            return ResponseEntity.ok(usuario);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+  @PatchMapping("/api/admin/agendamentos/{id}/status")
+@ResponseBody
+public ResponseEntity<?> atualizarStatusAgendamento(@PathVariable Long id, @RequestBody Map<String, String> body) {
+    String novoStatus = body.get("status");
+    boolean atualizado = agendamentoService.atualizarStatus(id, novoStatus);
+    
+    if (atualizado) {
+        return ResponseEntity.ok().build();
+    } else {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Agendamento não encontrado.");
+    }
+}
+
+@PostMapping("/api/admin/agendamentos/bloquear")
+@ResponseBody
+public ResponseEntity<?> bloquearData(@RequestBody Map<String, String> payload) {
+    try {
+        String dataStr = payload.get("data");
+
+        if (dataStr == null) {
+            return ResponseEntity.badRequest().body("Data não informada");
+        }
+
+        // Corrige o parsing: de ISO8601 com 'Z' → Instant → LocalDateTime
+        Instant instant = Instant.parse(dataStr);
+        LocalDateTime data = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+
+        // Sempre BLOQUEADO
+        Especialidade especialidade = Especialidade.BLOQUEADO;
+
+        // Chama o service para bloquear (assumindo que o status também é tratado lá)
+        Agendamento bloqueio = agendamentoService.bloquearData(data, especialidade);
+
+        return ResponseEntity.ok(bloqueio);
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Erro ao bloquear a data: " + e.getMessage());
+    }
+}
+
+@GetMapping("/api/admin/agendamentos/verificar-disponibilidade")
+@ResponseBody
+public ResponseEntity<?> verificarDisponibilidade(
+        @RequestParam("data") String dataStr) {
+    try {
+        LocalDate data = LocalDate.parse(dataStr);
+
+        LocalDateTime inicioDoDia = data.atStartOfDay();
+        LocalDateTime fimDoDia = data.plusDays(1).atStartOfDay().minusNanos(1);
+
+        List<Agendamento> agendamentosNoDia = agendamentoService
+            .buscarAgendamentosPorData(inicioDoDia, fimDoDia);
+
+        return ResponseEntity.ok(agendamentosNoDia);
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Erro ao verificar disponibilidade: " + e.getMessage());
+    }
+}
+
+    @GetMapping("/bloqueados")
+        public ResponseEntity<List<String>> getDatasBloqueadas(
+                @RequestParam int year,
+                @RequestParam int month) {
+            try {
+                List<LocalDate> datas = agendamentoService.buscarDatasBloqueadasNoMes(year, month);
+                List<String> datasFormatadas = datas.stream()
+                        .map(LocalDate::toString) // yyyy-MM-dd
+                        .collect(Collectors.toList());
+                return ResponseEntity.ok(datasFormatadas);
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Collections.emptyList());
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao atualizar agendamento");
         }
-    }
+        
 
-    // ✅ Deletar um agendamento
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletar(@PathVariable Long id) {
-        try {
-            if (agendamentoService.deleteAgendamento(id)) {
-                System.out.println("Agendamento deletado ID: " + id);
-                return ResponseEntity.noContent().build();
-            } else {
-                System.out.println("Agendamento não encontrado para exclusão ID: " + id);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Agendamento não encontrado");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao deletar agendamento");
-        }
-    }
+
 }

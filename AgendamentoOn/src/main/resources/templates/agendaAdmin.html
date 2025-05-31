@@ -210,11 +210,11 @@
           </a>
         </div>
         <div class="policies mt-auto" style="position: relative; bottom: 50px">
-          <a href="/login/termos.html"
+          <a href="/termos.html"
             ><i class="fa-regular fa-file-lines"></i> Termo de Consentimento e
             Política de Privacidade</a
           ><br />
-          <a href="/login/politicas.html"
+          <a href="/politicas.html"
             ><i class="fa-regular fa-file-lines"></i> Política de Cancelamento e
             Reagendamento</a
           >
@@ -258,7 +258,15 @@
               </table>
             </div>
           </div>
-          <button class="btn btn-confirm">Confirmar Data</button>
+
+         <button
+    id="btnBloquearData"
+    class="btn btn-confirm ms-2"
+    style="background-color: #e91e63; color: white;"  <!-- rosa e texto branco -->
+    onclick="window.location.href='/api/agenda'"
+>
+    Ir para Agendamento
+</button>
           <button
             id="btnBloquearData"
             class="btn btn-confirm ms-2"
@@ -978,6 +986,7 @@
 
                 <div class="d-flex gap-2">
                   <button
+                    id="btnAtualizarPerfil"
                     class="btn w-100 fw-bold text-white"
                     style="background-color: #22c55e"
                   >
@@ -1221,6 +1230,8 @@
     </div>
 
     <script>
+
+
       document.addEventListener("DOMContentLoaded", () => {
         let agendamentos =
           JSON.parse(localStorage.getItem("agendamentos")) || [];
@@ -1250,34 +1261,46 @@
             });
           });
 
-        // Botão "Confirmar Data" da Agenda
-        document.querySelector(".btn-confirm").addEventListener("click", () => {
-          // Verifica se uma data foi selecionada
-          if (!selectedDate) {
-            alert("Por favor, selecione uma data para o agendamento.");
-            return;
-          }
+          // Botão bloquear 
+document.querySelector("#btnBloquearData").addEventListener("click", () => {
+  if (!selectedDate) {
+    alert("Por favor, selecione uma data para bloquear.");
+    return;
+  }
 
-          const dataFormatada = selectedDate.toLocaleDateString("pt-BR", {
-            day: "2-digit",
-            month: "long",
-            year: "numeric",
-          });
+  const dataFormatadaISO = selectedDate.toISOString();
 
-          dataSelecionada = dataFormatada;
+  // Força especialidade como BLOQUEADO
+  const payload = {
+    data: dataFormatadaISO,
+    especialidade: "BLOQUEADO",
+    status: "BLOQUEADO"
+  };
 
-          // Atualiza o texto da nova seção com a data selecionada
-          document.getElementById(
-            "dataSelecionadaTexto"
-          ).textContent = `Data do agendamento: ${dataFormatada}`;
+  fetch("/api/admin/agendamentos/bloquear", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(response => {
+    if (!response.ok) {
+      return response.text().then(text => { throw new Error(text); });
+    }
+    return response.json();
+  })
+  .then(data => {
+    alert(`Data bloqueada com sucesso no servidor: ${data.data || 'confirme no backend'}`);
+    renderCalendar(currentDate);
+    selectedDate = null;
+  })
+  .catch(err => {
+    alert(`Erro ao bloquear a data: ${err.message}`);
+  });
+});
 
-          // Mostra a nova seção e oculta as demais
-          document
-            .querySelectorAll("section[id^='sec-']")
-            .forEach((sec) => (sec.style.display = "none"));
-          document.getElementById("sec-agendar-servico").style.display =
-            "block";
-        });
+       
 
         // Botão "Voltar" para a Agenda
         document
@@ -1695,6 +1718,27 @@
           });
         }
 
+        document.getElementById("btnEditarPerfil").addEventListener("click", async () => {
+    try {
+        const response = await fetch('/api/usuario-logado');
+        if (!response.ok) throw new Error("Erro ao buscar dados do usuário");
+
+        const usuario = await response.json();
+
+        document.getElementById("editarNome").value = usuario.nome || "";
+        document.getElementById("editarEmail").value = usuario.email || "";
+        document.getElementById("editarTelefone").value = usuario.telefone || "";
+
+        // Mostra a seção de edição e oculta as outras
+        document.querySelectorAll("section[id^='sec-']").forEach(sec => sec.style.display = "none");
+        document.getElementById("sec-perfil-editar").style.display = "block";
+
+    } catch (error) {
+        alert("Erro ao carregar dados do usuário: " + error.message);
+    }
+});
+
+
         // Calendário
         const calendarBody = document.getElementById("calendarBody");
         const monthYear = document.getElementById("monthYear");
@@ -1704,81 +1748,68 @@
         let selectedDate = null;
         let currentDate = new Date();
 
-        function renderCalendar(date) {
-          const year = date.getFullYear();
-          const month = date.getMonth();
-          const firstDay = new Date(year, month, 1).getDay();
-          const daysInMonth = new Date(year, month + 1, 0).getDate();
+       function renderCalendar(date) {
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-          const nomeMes = date.toLocaleString("pt-BR", { month: "long" });
-          if (monthYear) {
-            monthYear.innerHTML = `<span>${
-              nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1)
+        const nomeMes = date.toLocaleString("pt-BR", { month: "long" });
+        if (monthYear) {
+          monthYear.innerHTML = `<span>${nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1)
             }</span> <span>${year}</span>`;
-          }
-
-          if (!calendarBody) return;
-          calendarBody.innerHTML = "";
-          let row = document.createElement("tr");
-
-          for (let i = 0; i < firstDay; i++) {
-            row.appendChild(document.createElement("td"));
-          }
-
-          for (let day = 1; day <= daysInMonth; day++) {
-            if (row.children.length === 7) {
-              calendarBody.appendChild(row);
-              row = document.createElement("tr");
-            }
-
-            const cell = document.createElement("td");
-            const span = document.createElement("span");
-            span.classList.add("calendar-day");
-            span.textContent = day;
-
-            if (
-              selectedDate &&
-              selectedDate.getDate() === day &&
-              selectedDate.getMonth() === month &&
-              selectedDate.getFullYear() === year
-            ) {
-              span.classList.add("selected");
-            }
-
-            const datasBloqueadas =
-              JSON.parse(localStorage.getItem("datasBloqueadas")) || [];
-            const dataFormatada = new Date(year, month, day)
-              .toISOString()
-              .split("T")[0];
-
-            if (datasBloqueadas.includes(dataFormatada)) {
-              span.style.color = "#ccc";
-              span.style.textDecoration = "line-through";
-              span.style.cursor = "not-allowed";
-            } else {
-              span.addEventListener("click", () => {
-                const clickedDate = new Date(year, month, day);
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-
-                if (clickedDate < today) {
-                  alert("Você não pode selecionar uma data que já passou.");
-                  return;
-                }
-
-                selectedDate = clickedDate;
-                renderCalendar(currentDate);
-              });
-            }
-
-            cell.appendChild(span);
-            row.appendChild(cell);
-          }
-
-          if (row.children.length > 0) {
-            calendarBody.appendChild(row);
-          }
         }
+
+        if (!calendarBody) return;
+        calendarBody.innerHTML = "";
+        let row = document.createElement("tr");
+
+        for (let i = 0; i < firstDay; i++) {
+          row.appendChild(document.createElement("td"));
+        }
+
+        for (let day = 1; day <= daysInMonth; day++) {
+          if (row.children.length === 7) {
+            calendarBody.appendChild(row);
+            row = document.createElement("tr");
+          }
+
+          const cell = document.createElement("td");
+          const span = document.createElement("span");
+          span.classList.add("calendar-day");
+          span.textContent = day;
+
+          if (
+            selectedDate &&
+            selectedDate.getDate() === day &&
+            selectedDate.getMonth() === month &&
+            selectedDate.getFullYear() === year
+          ) {
+            span.classList.add("selected");
+          }
+
+          span.addEventListener("click", () => {
+            const clickedDate = new Date(year, month, day);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Zera hora para comparar só a data
+
+            if (clickedDate < today) {
+              alert("Você não pode selecionar uma data que já passou.");
+              return;
+            }
+
+            selectedDate = clickedDate;
+            renderCalendar(currentDate);
+          });
+
+          cell.appendChild(span);
+          row.appendChild(cell);
+        }
+
+        if (row.children.length > 0) {
+          calendarBody.appendChild(row);
+        }
+      }
 
         if (prevMonthBtn) {
           prevMonthBtn.addEventListener("click", () => {
@@ -1807,434 +1838,553 @@
         }
       });
 
-      function atualizarDashboard() {
-        const tabela = document.querySelector("#sec-dashboard table tbody");
-        tabela.innerHTML = "";
+const statusMap = {
+ "AGENDADO": "Agendado",
+  "CONCLUIDO": "Concluído",
+  "CANCELADO": "Cancelado"
+};
 
-        const agendamentos =
-          JSON.parse(localStorage.getItem("agendamentos")) || [];
+const especialidadeMap = {
+  "CILIOS_VOLUME_BRASILEIRO": "Cílios: Volume brasileiro",
+  "CILIOS_EFEITO_FOX": "Cílios: Efeito fox",
+  "CILIOS_EFEITO_MOLHADO": "Cílios: Efeito Molhado",
+  "CILIOS_VOLUME_5D": "Cílios: Volume 5D",
+  "SOBRANCELHAS_DESIGN": "Sobrancelhas: Design de sobrancelhas",
+  "SOBRANCELHAS_DESIGN_HENNA": "Sobrancelhas: Design com henna",
+  "SOBRANCELHAS_BROW_LAMINATION": "Sobrancelhas: Brow lamination",
+  "SOBRANCELHAS_LASH_LIFTING": "Sobrancelhas: Lash lifting"
+};
 
-        agendamentos.forEach((ag, index) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-      <td>${ag.servico}</td>
-      <td>${ag.cliente || "Cliente Desconhecido"}</td>
-      <td>${ag.status}</td>
-      <td>${ag.data}</td>
-    `;
-          tabela.appendChild(tr);
-        });
-      }
-      // Exibir dados do perfil com base no login
-      document.addEventListener("DOMContentLoaded", () => {
-        const usuarioLogado = JSON.parse(localStorage.getItem("usuario"));
+
+async function atualizarDashboard() {
+  const tabelaConcluidos = document.querySelector("#sec-dashboard .mb-4:nth-of-type(1) tbody");
+  const tabelaCancelados = document.querySelector("#sec-dashboard .mb-4:nth-of-type(2) tbody");
+  const totalClientesSpan = document.querySelector("#sec-dashboard .text-end span");
+
+  tabelaConcluidos.innerHTML = "";
+  tabelaCancelados.innerHTML = "";
+
+  try {
+    const response = await fetch('/api/admin/agendamentos');
+    if (!response.ok) throw new Error('Erro ao carregar agendamentos');
+
+    const agendamentos = await response.json();
+
+    const agora = new Date();
+    const mesAtual = agora.getMonth();
+    const anoAtual = agora.getFullYear();
+
+    // Filtra agendamentos do mês atual
+    const agendamentosDoMes = agendamentos.filter(ag => {
+      const dataAg = new Date(ag.data);
+      return dataAg.getMonth() === mesAtual && dataAg.getFullYear() === anoAtual;
+    });
+
+    // Filtra por status
+    let agendamentosConcluidos = agendamentosDoMes.filter(ag => ag.status === "CONCLUIDO");
+    let agendamentosCancelados = agendamentosDoMes.filter(ag => ag.status === "CANCELADO");
+
+    // Função para remover duplicatas pelo id
+    function removerDuplicadosPorId(agendamentos) {
+      const ids = new Set();
+      return agendamentos.filter(ag => {
+        if (ids.has(ag.id)) {
+          return false;
+        } else {
+          ids.add(ag.id);
+          return true;
+        }
+      });
+    }
+
+    // Remove duplicatas por id
+    agendamentosConcluidos = removerDuplicadosPorId(agendamentosConcluidos);
+    agendamentosCancelados = removerDuplicadosPorId(agendamentosCancelados);
+
+    // Renderiza concluídos
+    agendamentosConcluidos.forEach(ag => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${especialidadeMap[ag.especialidade] || "Serviço desconhecido"}</td>
+        <td>${ag.cliente?.nome || "Cliente Desconhecido"}</td>
+        <td>${statusMap[ag.status] || "Status desconhecido"}</td>
+        <td>${ag.data ? new Date(ag.data).toLocaleDateString() : "Data não informada"}</td>
+      `;
+      tabelaConcluidos.appendChild(tr);
+    });
+
+    // Renderiza cancelados
+    agendamentosCancelados.forEach(ag => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${especialidadeMap[ag.especialidade] || "Serviço desconhecido"}</td>
+        <td>${ag.cliente?.nome || "Cliente Desconhecido"}</td>
+        <td>${statusMap[ag.status] || "Status desconhecido"}</td>
+        <td>${ag.data ? new Date(ag.data).toLocaleDateString() : "Data não informada"}</td>
+      `;
+      tabelaCancelados.appendChild(tr);
+    });
+
+    // Contagem de clientes únicos com base no id do cliente
+    const clientesUnicos = new Set(
+      agendamentosConcluidos.map(ag => ag.cliente?.email || ag.cliente?.id || ag.cliente?.nome)
+    );
+
+    totalClientesSpan.textContent = clientesUnicos.size;
+
+    document.querySelector("#sec-dashboard").style.display = "block";
+
+  } catch (error) {
+    console.error("Erro ao atualizar dashboard:", error);
+    tabelaConcluidos.innerHTML = `<tr><td colspan="4">Erro ao carregar dados.</td></tr>`;
+    tabelaCancelados.innerHTML = `<tr><td colspan="4">Erro ao carregar dados.</td></tr>`;
+    totalClientesSpan.textContent = "0";
+  }
+}
+
+async function atualizarPerfil() {
+  const nome = document.getElementById("editarNome").value.trim();
+  const email = document.getElementById("editarEmail").value.trim(); // pode estar bloqueado pra edição, só pra exibir
+  const senha = document.getElementById("editarSenha").value;
+  const confirmarSenha = document.getElementById("editarSenhaConfirmar").value;
+  const telefone = document.getElementById("editarTelefone").value.trim();
+
+  if (senha !== confirmarSenha) {
+    alert("As senhas não coincidem.");
+    return;
+  }
+
+  // Monta o objeto para enviar
+  const usuarioAtualizado = {
+    nome: nome,
+    email: email,          // pode até não enviar se backend usar o email da sessão
+    senha: senha || null,  // envia senha só se foi preenchida
+    telefone: telefone
+  };
+
+  try {
+       const response = await fetch('/usuario-logado', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(usuarioAtualizado)
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error || 'Erro ao atualizar perfil');
+    }
+
+    const usuarioAtualizadoResposta = await response.json();
+
+    // Atualiza localStorage para manter dados atualizados
+    localStorage.setItem("usuario", JSON.stringify(usuarioAtualizadoResposta));
+
+    document.getElementById("perfilNome").textContent = usuarioAtualizadoResposta.nome || "Não informado";
+document.getElementById("perfilEmail").textContent = usuarioAtualizadoResposta.email || "Não informado";
+document.getElementById("perfilTelefone").textContent = usuarioAtualizadoResposta.telefone || "Não informado";
+
+
+    alert("Perfil atualizado com sucesso!");
+
+    // Opcional: voltar para a tela anterior ou atualizar a exibição do perfil
+    document.getElementById("btnVoltarPerfil").click();
+
+  } catch (error) {
+    alert("Falha ao atualizar perfil: " + error.message);
+  }
+}
+
+
+document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        // ✅ Buscar dados do usuário logado via API
+        const userResponse = await fetch('/api/usuario-logado');
+        if (!userResponse.ok) throw new Error('Erro ao buscar usuário logado');
+        const usuarioLogado = await userResponse.json();
 
         if (usuarioLogado) {
-          const nome = usuarioLogado.nome || "Não informado";
-          const email = usuarioLogado.email || "Não informado";
-          const telefone = usuarioLogado.telefone || "Não informado"; // só aparece se você estiver armazenando
+            const nomeElem = document.getElementById("perfilNome");
+            const emailElem = document.getElementById("perfilEmail");
+            const telefoneElem = document.getElementById("perfilTelefone");
 
-          const nomeElem = document.getElementById("perfilNome");
-          const emailElem = document.getElementById("perfilEmail");
-          const telefoneElem = document.getElementById("perfilTelefone");
+            if (nomeElem) nomeElem.textContent = usuarioLogado.nome || "Não informado";
+            if (emailElem) emailElem.textContent = usuarioLogado.email || "Não informado";
+            if (telefoneElem) telefoneElem.textContent = usuarioLogado.telefone || "Não informado";
 
-          if (nomeElem) nomeElem.textContent = nome;
-          if (emailElem) emailElem.textContent = email;
-          if (telefoneElem) telefoneElem.textContent = telefone;
+            // ✅ Exibir menus para admin
+            if (usuarioLogado.role === "ADMINISTRADOR") {
+                const adminLink = document.getElementById("adminDashboardLink");
+                if (adminLink) {
+                    adminLink.style.display = "flex";
+
+                    document.querySelectorAll("section[id^='sec-']").forEach(sec => sec.style.display = "none");
+                    document.getElementById("sec-dashboard").style.display = "block";
+
+                    document.querySelectorAll(".sidebar a").forEach(link => link.classList.remove("active"));
+                    adminLink.classList.add("active");
+                }
+
+                // ✅ Adicionar links extras
+                const menuSidebar = document.querySelector(".sidebar div");
+                if (menuSidebar) {
+                    const linkClientes = document.createElement("a");
+                    linkClientes.href = "#";
+                    linkClientes.dataset.section = "clientes";
+                    linkClientes.innerHTML = '<i class="fa-solid fa-users"></i> Clientes';
+
+                    const linkDashboard = document.querySelector('.sidebar a[data-section="dashboard"]');
+                    if (linkDashboard) {
+                        menuSidebar.insertBefore(linkClientes, linkDashboard);
+                    }
+
+                    const linkHistorico = document.createElement("a");
+                    linkHistorico.href = "#";
+                    linkHistorico.dataset.section = "historico-agendamentos";
+                    linkHistorico.innerHTML = '<i class="fa-regular fa-clock"></i> Histórico de Agendamentos';
+                    menuSidebar.insertBefore(linkHistorico, menuSidebar.children[1]);
+                }
+            }
         } else {
-          console.warn("Usuário não está logado.");
+            console.warn("Usuário não está logado.");
         }
-      });
-      const btnAtualizarPerfil = document.querySelector(
-        "#sec-perfil-editar button.btn"
-      );
+    } catch (error) {
+        console.error("Erro ao carregar perfil:", error);
+    }
 
-      if (btnAtualizarPerfil) {
-        btnAtualizarPerfil.addEventListener("click", () => {
-          const nome = document.getElementById("editarNome").value.trim();
-          const email = document.getElementById("editarEmail").value.trim();
-          const senha = document.getElementById("editarSenha").value;
-          const senhaConfirmar = document.getElementById(
-            "editarSenhaConfirmar"
-          ).value;
-          const telefone = document
-            .getElementById("editarTelefone")
-            .value.trim();
+    // ✅ Atualizar Dashboard
+    atualizarDashboard();
 
-          if (!nome || !email) {
-            alert("Nome e e-mail são obrigatórios.");
-            return;
+   document.addEventListener("DOMContentLoaded", () => {
+  const btnAtualizarPerfil = document.querySelector("#sec-perfil-editar button.btn");
+  if (btnAtualizarPerfil) {
+    btnAtualizarPerfil.addEventListener("click", async () => {
+      const nome = document.getElementById("editarNome").value;
+      const email = document.getElementById("editarEmail").value;
+      const telefone = document.getElementById("editarTelefone").value;
+
+      try {
+        const updateResponse = await fetch('/usuario-logado', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome, email, telefone })
+        });
+
+        if (!updateResponse.ok) throw new Error('Erro ao atualizar perfil');
+
+        const updatedUser = await updateResponse.json();
+        alert('Perfil atualizado com sucesso!');
+
+        document.getElementById("perfilNome").textContent = usuarioAtualizadoResposta.nome || "Não informado";
+document.getElementById("perfilEmail").textContent = usuarioAtualizadoResposta.email || "Não informado";
+document.getElementById("perfilTelefone").textContent = usuarioAtualizadoResposta.telefone || "Não informado";
+
+
+        // Atualiza elementos na tela (se tiver esses elementos para mostrar os dados)
+        document.getElementById("perfilNome").textContent = updatedUser.nome;
+        document.getElementById("perfilEmail").textContent = updatedUser.email;
+        document.getElementById("perfilTelefone").textContent = updatedUser.telefone;
+
+      } catch (error) {
+        console.error("Erro ao atualizar perfil:", error);
+        alert("Erro ao atualizar perfil.");
+      }
+    });
+  }
+});
+
+  // Listener dos links da sidebar para troca de seções
+  document.querySelectorAll(".sidebar a[data-section]").forEach(el => {
+    el.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      document.querySelectorAll(".sidebar a").forEach(a => a.classList.remove("active"));
+      el.classList.add("active");
+
+      document.querySelectorAll("section[id^='sec-']").forEach(sec => sec.style.display = "none");
+
+      const secao = document.getElementById("sec-" + el.dataset.section);
+      if (secao) secao.style.display = "block";
+    });
+  });
+});
+
+
+    async function carregarClientes() {
+  const tabela = document.getElementById("tabelaClientes");
+  tabela.innerHTML = ""; // limpa tabela antes
+
+  try {
+    const response = await fetch('/api/admin/clientes');
+    if (!response.ok) throw new Error('Erro ao buscar clientes');
+
+    const clientesJson = await response.json();
+    console.log('Resposta da API:', clientesJson);
+
+    // Se clientesJson for um objeto e o array estiver em 'data'
+    const clientes = Array.isArray(clientesJson) ? clientesJson : clientesJson.data;
+
+    if (!clientes || clientes.length === 0) {
+      tabela.innerHTML = `<tr><td colspan="3">Nenhum cliente encontrado.</td></tr>`;
+      return;
+    }
+
+    clientes.forEach(cliente => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${cliente.nome || "Não informado"}</td>
+        <td>${cliente.email || "Não informado"}</td>
+        <td>${cliente.telefone || "Não informado"}</td>
+      `;
+      tabela.appendChild(tr);
+    });
+  } catch (error) {
+    console.error('Erro ao carregar clientes:', error);
+    tabela.innerHTML = `<tr><td colspan="3">Erro ao carregar clientes.</td></tr>`;
+  }
+}
+
+function formatarData(dataIso) {
+  const data = new Date(dataIso);
+  return data.toLocaleDateString('pt-BR');
+}
+
+function formatarHorario(dataIso) {
+  const data = new Date(dataIso);
+  return data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+}
+
+  async function carregarTodosAgendamentos() {
+  try {
+    const response = await fetch('/api/admin/agendamentos/todos');
+    if (!response.ok) {
+      throw new Error('Erro ao carregar todos os agendamentos');
+    }
+
+    const agendamentos = await response.json();
+    const tabela = document.getElementById("tabelaHistoricoAgendamentos");
+    tabela.innerHTML = "";
+
+    agendamentos.forEach((ag, index) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${ag.cliente?.nome || "Cliente Desconhecido"}</td>
+        <td>${formatarData(ag.data)}</td>
+        <td>${formatarHorario(ag.data)}</td>
+        <td>
+          <button class="btn btn-info fw-bold" onclick="abrirDetalhesHistorico(${index})">Detalhes</button
+        </td>
+      `;
+      tabela.appendChild(tr);
+    });
+
+    window.todosAgendamentos = agendamentos;
+
+  } catch (error) {
+    console.error('Erro ao carregar todos os agendamentos:', error);
+    alert('Erro ao carregar todos os agendamentos: ' + error.message);
+  }
+}
+
+
+
+    document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    // Busca o usuário autenticado no backend
+    const response = await fetch('/api/admin/me');
+
+    if (!response.ok) {
+      console.error('Usuário não autenticado');
+      return;
+    }
+
+    const usuario = await response.json();
+
+    // Chama carregarClientes independente do tipo de usuário
+    carregarClientes();
+    atualizarDashboard();
+    carregarTodosAgendamentos();
+
+    // Mostrar a seção clientes no carregamento inicial
+    const secaoClientes = document.getElementById("sec-clientes");
+    if (secaoClientes) secaoClientes.style.display = "block";
+
+    // Configura evento de clique para os links da sidebar
+    document.querySelectorAll(".sidebar a[data-section]").forEach(link => {
+      link.addEventListener("click", e => {
+        e.preventDefault();
+        const section = link.getAttribute("data-section");
+
+        // Esconde todas as seções
+        document.querySelectorAll("section[id^='sec-']").forEach(sec => sec.style.display = "none");
+
+        // Mostra a seção selecionada
+        const secao = document.getElementById("sec-" + section);
+        if (secao) secao.style.display = "block";
+
+        // Carrega dados específicos conforme a seção
+        if (section === "clientes") {
+          carregarClientes();
+        } else if (section === "historico-agendamentos") {
+            carregarTodosAgendamentos();        
           }
-
-          if (senha !== senhaConfirmar) {
-            alert("As senhas não coincidem.");
-            return;
-          }
-
-          // Atualiza no localStorage
-          const usuarioAtualizado = {
-            ...JSON.parse(localStorage.getItem("usuario")),
-            nome,
-            email,
-            telefone,
-          };
-
-          if (senha) usuarioAtualizado.senha = senha;
-
-          localStorage.setItem("usuario", JSON.stringify(usuarioAtualizado));
-          alert("Dados atualizados com sucesso!");
-
-          // Atualiza a visualização no perfil
-          document.getElementById("perfilNome").textContent = nome;
-          document.getElementById("perfilEmail").textContent = email;
-          document.getElementById("perfilTelefone").textContent =
-            telefone || "Não informado";
-
-          // Volta para a tela de perfil
-          document
-            .querySelectorAll("section[id^='sec-']")
-            .forEach((sec) => (sec.style.display = "none"));
-          document.getElementById("sec-perfil").style.display = "block";
-        });
-      }
-
-      const usuario = JSON.parse(localStorage.getItem("usuario"));
-
-      if (usuario && usuario.tipo === "admin") {
-        const adminLink = document.getElementById("adminDashboardLink");
-
-        atualizarDashboard();
-
-        if (adminLink) {
-          adminLink.style.display = "flex"; // mostra o botão na sidebar
-
-          // mostra direto o dashboard
-          document
-            .querySelectorAll("section[id^='sec-']")
-            .forEach((sec) => (sec.style.display = "none"));
-          document.getElementById("sec-dashboard").style.display = "block";
-
-          // destaca o menu
-          document
-            .querySelectorAll(".sidebar a")
-            .forEach((link) => link.classList.remove("active"));
-          adminLink.classList.add("active");
-        }
-      }
-
-      function adicionarAgendamento(servico, data, horario) {
-        const novo = { servico, data, horario, status: "AGENDADO" };
-
-        let todos = JSON.parse(localStorage.getItem("agendamentos")) || [];
-        todos.push(novo);
-        localStorage.setItem("agendamentos", JSON.stringify(todos));
-
-        agendamentos.push(novo);
-        atualizarListaAgendamentos();
-      }
-
-      document.addEventListener("DOMContentLoaded", () => {
-        const usuario = JSON.parse(localStorage.getItem("usuario"));
-
-        if (usuario && usuario.tipo === "admin") {
-          document
-            .querySelectorAll("section[id^='sec-']")
-            .forEach((sec) => (sec.style.display = "none"));
-          document.getElementById("sec-dashboard").style.display = "block";
-
-          // Ativa menu do dashboard
-          document
-            .querySelectorAll(".sidebar a")
-            .forEach((link) => link.classList.remove("active"));
-          const linkDashboard = document.querySelector(
-            '.sidebar a[data-section="dashboard"]'
-          );
-        }
       });
+    });
 
-      // Exibir histórico de agendamentos apenas se for admin
-      document.addEventListener("DOMContentLoaded", () => {
-        const usuario = JSON.parse(localStorage.getItem("usuario"));
-        const link = document.createElement("a");
-        link.href = "#";
-        link.setAttribute("data-section", "historico-agendamentos");
-        link.innerHTML =
-          '<i class="fa-regular fa-clock"></i> Histórico de Agendamentos';
+    // Mostrar dashboard e ativar menu para qualquer usuário
+    const secaoAdminBoasVindas = document.getElementById("sec-agenda-admin");
+    if (secaoAdminBoasVindas) secaoAdminBoasVindas.style.display = "none";
 
-        if (usuario && usuario.tipo === "admin") {
-          const menu = document.querySelector(".sidebar div");
-          menu.insertBefore(link, menu.children[1]); // insere depois de "Agenda"
-        }
+    document.querySelectorAll("section[id^='sec-']").forEach(sec => sec.style.display = "none");
+    const dashboard = document.getElementById("sec-dashboard");
+    if (dashboard) dashboard.style.display = "block";
 
-        document.querySelectorAll(".sidebar a[data-section]").forEach((el) => {
-          el.addEventListener("click", (e) => {
-            e.preventDefault();
+    document.querySelectorAll(".sidebar a").forEach(link => link.classList.remove("active"));
+    const linkDashboard = document.querySelector('.sidebar a[data-section="dashboard"]');
+    if (linkDashboard) linkDashboard.classList.add("active");
 
-            document
-              .querySelectorAll(".sidebar a")
-              .forEach((a) => a.classList.remove("active"));
-            el.classList.add("active");
+       carregarTodosAgendamentos();
 
-            document.querySelectorAll("section[id^='sec-']").forEach((sec) => {
-              sec.style.display = "none";
-            });
+    const btnBloquear = document.getElementById("btnBloquearData");
+    if (btnBloquear) btnBloquear.style.display = "inline-block";
 
-            const secao = document.getElementById("sec-" + el.dataset.section);
-            if (secao) secao.style.display = "block";
-          });
-        });
-      });
+  } catch (error) {
+    console.error('Erro ao buscar usuário:', error);
+  }
+});
 
-      if (usuario && usuario.tipo === "admin") {
-        const menuSidebar = document.querySelector(".sidebar div");
 
-        const linkClientes = document.createElement("a");
-        linkClientes.href = "#";
-        linkClientes.dataset.section = "clientes";
-        linkClientes.innerHTML = '<i class="fa-solid fa-users"></i> Clientes';
+// Funções fora do DOMContentLoaded (podem ficar fora)
 
-        const linkDashboard = document.querySelector(
-          '.sidebar a[data-section="dashboard"]'
-        );
-        menuSidebar.insertBefore(linkClientes, linkDashboard);
-      }
+const tabela = document.getElementById("tabelaHistoricoAgendamentos");
+const agendamentos = JSON.parse(localStorage.getItem("agendamentos")) || [];
 
-      function carregarClientes() {
-        const tabela = document.getElementById("tabelaClientes");
+function abrirDetalhesHistorico(index) {
+  const agendamentos = window.todosAgendamentos || JSON.parse(localStorage.getItem("agendamentos")) || [];
 
-        const clientes = [
-          {
-            nome: "Maria Cristina",
-            email: "maria.cristina@gmail.com",
-            telefone: "(11) 98520-5216",
-          },
-          {
-            nome: "Rosalia Fernanda",
-            email: "rosalia.fern@gmail.com",
-            telefone: "(11) 98520-5216",
-          },
-          {
-            nome: "Bruna Oliveira",
-            email: "bruna.Olive@gmail.com",
-            telefone: "(11) 98520-5216",
-          },
-          {
-            nome: "Lilian Cunha",
-            email: "lilian.cunha@gmail.com",
-            telefone: "(11) 98520-5216",
-          },
-        ];
+  if (!agendamentos[index]) {
+    alert("Agendamento não encontrado.");
+    return;
+  }
 
-        tabela.innerHTML = "";
-        clientes.forEach((cliente) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-      <td>${cliente.nome}</td>
-      <td>${cliente.email}</td>
-      <td>${cliente.telefone}</td>
-    `;
-          tabela.appendChild(tr);
-        });
-      }
+  const ag = agendamentos[index];
 
-      function carregarHistoricoAgendamentos() {
-        const tabela = document.getElementById("tabelaHistoricoAgendamentos");
-        tabela.innerHTML = "";
+  document.getElementById("detalheHistoricoNome").textContent = ag.cliente?.nome || ag.cliente || "-";
+  document.getElementById("detalheHistoricoTelefone").textContent = ag.cliente?.telefone || ag.telefone || "-";
 
-        agendamentos.forEach((ag, index) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-      <td>${ag.cliente || "Cliente Desconhecido"}</td>
-      <td>${ag.data}</td>
-      <td>${ag.horario}</td>
-      <td>
-        <button class="btn btn-warning fw-bold" onclick="abrirDetalhesHistorico(${index})">Detalhes</button>
-      </td>
-    `;
-          tabela.appendChild(tr);
-        });
-      }
+  // Exibir descrição da especialidade pelo enum
+  document.getElementById("detalheHistoricoServico").textContent = especialidadeMap[ag.especialidade] || "-";
 
-      document.querySelectorAll(".sidebar a[data-section]").forEach((link) => {
-        link.addEventListener("click", function (e) {
-          e.preventDefault();
+  document.getElementById("detalheHistoricoData").textContent = formatarData(ag.data);
+  document.getElementById("detalheHistoricoHorario").textContent = formatarHorario(ag.data);
+  document.getElementById("statusHistorico").value = ag.status || "AGENDADO";
 
-          const section = this.getAttribute("data-section");
+  document.querySelectorAll("section[id^='sec-']").forEach((sec) => {
+    sec.style.display = "none";
+  });
+  document.getElementById("sec-historico-detalhes").style.display = "block";
 
-          if (section === "historico-agendamentos") {
-            carregarHistoricoAgendamentos();
-          }
+  document.getElementById("btnAtualizarStatus").dataset.index = index;
+}
 
-          // Lógica de exibição da seção correspondente
-          document
-            .querySelectorAll(".sidebar a")
-            .forEach((l) => l.classList.remove("active"));
-          this.classList.add("active");
+async function atualizarStatusNoBanco(id, novoStatus) {
+  try {
+    const response = await fetch(`/api/admin/agendamentos/${id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: novoStatus }),
+    });
 
-          document
-            .querySelectorAll("section[id^='sec-']")
-            .forEach((sec) => (sec.style.display = "none"));
+    if (!response.ok) {
+      throw new Error('Erro ao atualizar o status no banco.');
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Erro ao atualizar status no banco: " + error.message);
+  }
+}
 
-          const secao = document.getElementById("sec-" + section);
-          if (secao) secao.style.display = "block";
-        });
-      });
+document.getElementById("btnAtualizarStatus").addEventListener("click", async () => {
+    const index = document.getElementById("btnAtualizarStatus").dataset.index;
+    const novoStatus = document.getElementById("statusHistorico").value;
 
-      document.querySelectorAll(".sidebar a[data-section]").forEach((link) => {
-        link.addEventListener("click", function (e) {
-          e.preventDefault();
+    const agendamentos = window.todosAgendamentos || JSON.parse(localStorage.getItem("agendamentos")) || [];
 
-          const section = this.getAttribute("data-section");
+    if (agendamentos[index]) {
+        const agendamento = agendamentos[index];
 
-          // Remover classes ativas
-          document
-            .querySelectorAll(".sidebar a")
-            .forEach((l) => l.classList.remove("active"));
-          this.classList.add("active");
+        // Atualiza no backend
+        await atualizarStatusNoBanco(agendamento.id, novoStatus);
 
-          // Esconder todas as seções
-          document
-            .querySelectorAll("section[id^='sec-']")
-            .forEach((sec) => (sec.style.display = "none"));
+        // Atualiza localmente
+        agendamento.status = novoStatus;
 
-          // Seções especiais
-          if (section === "clientes") {
-            carregarClientes();
-          }
-
-          // Mostrar a seção correspondente
-          const secao = document.getElementById("sec-" + section);
-          if (secao) secao.style.display = "block";
-        });
-      });
-
-      const tabela = document.getElementById("tabelaHistoricoAgendamentos");
-      const agendamentos =
-        JSON.parse(localStorage.getItem("agendamentos")) || [];
-
-      function abrirDetalhesHistorico(index) {
-        const agendamentos =
-          JSON.parse(localStorage.getItem("agendamentos")) || [];
-
-        if (!agendamentos[index]) {
-          alert("Agendamento não encontrado.");
-          return;
-        }
-
-        const ag = agendamentos[index];
-
-        // Preenche os campos de detalhes
-        document.getElementById("detalheHistoricoNome").textContent =
-          ag.cliente || "-";
-        document.getElementById("detalheHistoricoTelefone").textContent =
-          ag.telefone || "-";
-        document.getElementById("detalheHistoricoServico").textContent =
-          ag.servico || "-";
-        document.getElementById("detalheHistoricoData").textContent =
-          ag.data || "-";
-        document.getElementById("detalheHistoricoHorario").textContent =
-          ag.horario || "-";
-        document.getElementById("statusHistorico").value =
-          ag.status || "AGENDADO";
-
-        // Mostra a seção correta e oculta as outras
-        document.querySelectorAll("section[id^='sec-']").forEach((sec) => {
-          sec.style.display = "none";
-        });
-        document.getElementById("sec-historico-detalhes").style.display =
-          "block";
-
-        // Armazena o índice para ser usado ao atualizar o status
-        document.getElementById("btnAtualizarStatus").dataset.index = index;
-      }
-
-      document
-        .getElementById("btnAtualizarStatus")
-        .addEventListener("click", () => {
-          const index =
-            document.getElementById("btnAtualizarStatus").dataset.index;
-          const novoStatus = document.getElementById("statusHistorico").value;
-
-          const agendamentos =
-            JSON.parse(localStorage.getItem("agendamentos")) || [];
-          if (agendamentos[index]) {
-            agendamentos[index].status = novoStatus;
+        if (!window.todosAgendamentos) {
             localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
-            alert("Status atualizado com sucesso!");
-            document.getElementById("statusSelecionado").value = novoStatus;
-          }
-        });
-
-      document
-        .getElementById("btnVoltarHistorico")
-        .addEventListener("click", () => {
-          document.getElementById("sec-historico-detalhes").style.display =
-            "none";
-          document.getElementById("sec-historico-agendamentos").style.display =
-            "block";
-        });
-
-      document.addEventListener("DOMContentLoaded", () => {
-        const usuario = JSON.parse(localStorage.getItem("usuario"));
-
-        if (usuario && usuario.tipo === "admin") {
-          // Esconde a seção de boas-vindas
-          const secaoAdminBoasVindas =
-            document.getElementById("sec-agenda-admin");
-          if (secaoAdminBoasVindas) secaoAdminBoasVindas.style.display = "none";
-
-          // Mostra a seção do dashboard
-          document.querySelectorAll("section[id^='sec-']").forEach((sec) => {
-            sec.style.display = "none";
-          });
-          const dashboard = document.getElementById("sec-dashboard");
-          if (dashboard) dashboard.style.display = "block";
-
-          // Ativa o menu Dashboard
-          document
-            .querySelectorAll(".sidebar a")
-            .forEach((link) => link.classList.remove("active"));
-          const linkDashboard = document.querySelector(
-            '.sidebar a[data-section="dashboard"]'
-          );
-          if (linkDashboard) linkDashboard.classList.add("active");
-
-          // Carregar os dados
-          carregarHistoricoAgendamentos();
         }
-      });
 
-      if (usuario && usuario.tipo === "admin") {
-        const btnBloquear = document.getElementById("btnBloquearData");
-        if (btnBloquear) btnBloquear.style.display = "inline-block";
-      }
+        alert("Status atualizado com sucesso!");
+        document.getElementById("statusSelecionado").value = novoStatus;
+    } else {
+        alert("Agendamento não encontrado para atualização.");
+    }
+});
 
-      document
-        .getElementById("btnBloquearData")
-        .addEventListener("click", () => {
-          if (!selectedDate) {
-            alert("Selecione uma data no calendário para bloquear.");
-            return;
-          }
 
-          const dataBloqueada = selectedDate.toISOString().split("T")[0]; // Ex: 2025-06-01
-          let datasBloqueadas =
-            JSON.parse(localStorage.getItem("datasBloqueadas")) || [];
+function formatarData(dataString) {
+  if (!dataString) return "-";
+  const data = new Date(dataString);
+  return data.toLocaleDateString('pt-BR');
+}
 
-          if (datasBloqueadas.includes(dataBloqueada)) {
-            alert("Esta data já está bloqueada.");
-            return;
-          }
+function formatarHorario(dataString) {
+  if (!dataString) return "-";
+  const data = new Date(dataString);
+  return data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+}
 
-          datasBloqueadas.push(dataBloqueada);
-          localStorage.setItem(
-            "datasBloqueadas",
-            JSON.stringify(datasBloqueadas)
-          );
 
-          alert("Data bloqueada com sucesso!");
-          renderCalendar(currentDate); // Re-renderiza o calendário
-        });
+document.getElementById("btnVoltarHistorico").addEventListener("click", () => {
+  document.getElementById("sec-historico-detalhes").style.display = "none";
+  document.getElementById("sec-historico-agendamentos").style.display = "block";
+});
+
+document.getElementById("btnBloquearData").addEventListener("click", () => {
+  if (!selectedDate) {
+    alert("Selecione uma data no calendário para bloquear.");
+    return;
+  }
+
+  const dataBloqueada = selectedDate.toISOString().split("T")[0]; // Formato: AAAA-MM-DD
+  let datasBloqueadas = JSON.parse(localStorage.getItem("datasBloqueadas")) || [];
+
+  if (datasBloqueadas.includes(dataBloqueada)) {
+    alert("Esta data já está bloqueada.");
+    return;
+  }
+
+  datasBloqueadas.push(dataBloqueada);
+  localStorage.setItem("datasBloqueadas", JSON.stringify(datasBloqueadas));
+
+  alert("Data bloqueada com sucesso!");
+  renderCalendar(currentDate); // Re-renderiza o calendário
+});
+
+         document.addEventListener("DOMContentLoaded", () => {
+  const btnAtualizarPerfil = document.getElementById("btnAtualizarPerfil");
+  if (btnAtualizarPerfil) {
+    btnAtualizarPerfil.addEventListener("click", async (e) => {
+      e.preventDefault();  // evita o submit padrão se for dentro de form
+      await atualizarPerfil();
+    });
+  }
+});
+
+
+
+
+
     </script>
   </body>
 </html>

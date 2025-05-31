@@ -5,6 +5,7 @@ public enum Status {
 
     AGENDADO,
     CONCLUIDO,
-    CANCELADO;
+    CANCELADO,
+    BLOQUEADO;
 
 }

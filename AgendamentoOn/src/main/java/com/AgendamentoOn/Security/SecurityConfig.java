@@ -21,17 +21,19 @@ public class SecurityConfig {
         this.customUserDetailsService = customUserDetailsService;
     }
 
- @Bean
+@Bean
 public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
         .authorizeRequests()
-            .requestMatchers("/", "/login", "/cadastrar", "/recuperar","/termos","/politicas", "/assets/**").permitAll()
+            .requestMatchers("/", "/login", "/cadastrar", "/recuperar", "/termos", "/politicas", "/assets/**").permitAll()
+            .requestMatchers("/agenda-admin").hasRole("ADMINISTRADOR")  // Só admin
+            .requestMatchers("/api/agenda").hasAnyRole("ADMINISTRADOR", "CLIENTE")  // admin ou cliente
             .anyRequest().authenticated()
         .and()
         .formLogin()
             .loginPage("/login")
             .defaultSuccessUrl("/login-success", true)
-            .failureUrl("/login?error=true")  // redireciona para login com erro
+            .failureUrl("/login?error=true")
             .permitAll()
         .and()
         .logout()
@@ -42,6 +44,7 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
 
     return http.build();
 }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {

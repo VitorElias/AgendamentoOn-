@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.AgendamentoOn.Enum.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -39,6 +40,7 @@ public class Usuario {
     @NotBlank(message = "Senha é obrigatória")
     @Size(min = 8, message = "A senha deve ter pelo menos 8 caracteres")
     @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).+$", message = "Senha deve conter ao menos 1 maiúscula, 1 número e 1 caractere especial")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String senha;
 
     private String telefone;
@@ -51,7 +53,7 @@ public class Usuario {
     private List<Agendamento> agendamentos = new ArrayList<>();
 
     public Usuario() {
-        this.role = Role.ADMINISTRADOR;
+        this.role = Role.CLIENTE;
     }
 
     public Usuario(@NotNull @Size(min = 3, max = 100) String nome, @NotNull String email, @NotNull String senha,

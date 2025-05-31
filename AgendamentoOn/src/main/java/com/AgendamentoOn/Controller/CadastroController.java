@@ -34,7 +34,7 @@ public class CadastroController {
     @PostMapping("/cadastrar")
 public String processCadastro(@Valid Usuario usuario, BindingResult bindingResult, Model model) {
 
-    usuarioService.salvar(usuario, bindingResult); // valida e salva
+    usuarioService.salvar(usuario); 
 
     if (bindingResult.hasErrors()) {
         model.addAttribute("pageTitle", "Cadastro de Cliente");

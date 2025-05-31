@@ -8,7 +8,8 @@ public enum Especialidade {
     SOBRANCELHAS_DESIGN("Sobrancelhas: Design de sobrancelhas"),
     SOBRANCELHAS_DESIGN_HENNA("Sobrancelhas: Design com henna"),
     SOBRANCELHAS_BROW_LAMINATION("Sobrancelhas: Brow lamination"),
-    SOBRANCELHAS_LASH_LIFTING("Sobrancelhas: Lash lifting");
+    SOBRANCELHAS_LASH_LIFTING("Sobrancelhas: Lash lifting"),
+    BLOQUEADO("Horário Bloqueado");
 
     private final String descricao;
 

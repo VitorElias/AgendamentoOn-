@@ -3,6 +3,7 @@ package com.AgendamentoOn.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -14,8 +15,6 @@ import com.AgendamentoOn.Enum.Especialidade;
 import com.AgendamentoOn.Enum.Status;
 import com.AgendamentoOn.Model.Agendamento;
 import com.AgendamentoOn.Repository.AgendamentoRepository;
-import java.util.Arrays;
-
 
 import jakarta.transaction.Transactional;
 
@@ -33,6 +32,7 @@ public class AgendamentoService {
     return ag.getStatus() == Status.BLOQUEADO || ag.getEspecialidade() == Especialidade.BLOQUEADO;
 }
 
+    
     // Método para salvar um agendamento
     public Agendamento saveAgendamento(Agendamento agendamento) {
         return agendamentoRepository.save(agendamento); // Hibernate cuida da persistência
@@ -143,7 +143,7 @@ public List<Agendamento> buscarAgendamentosPorData(LocalDateTime inicio, LocalDa
             .findByDataBetweenAndStatusInOrEspecialidade(
                 primeiroDia.atStartOfDay(), 
                 ultimoDia.atTime(23,59,59, 999_999_999),
-                Arrays.asList(Status.AGENDADO, Status.BLOQUEADO),
+                Arrays.asList(Status.BLOQUEADO),
                 Especialidade.BLOQUEADO);
 
         // Retorna apenas as datas únicas
@@ -168,6 +168,20 @@ public List<Agendamento> buscarAgendamentosPorData(LocalDateTime inicio, LocalDa
     // Se o dia não está bloqueado, verifica se o horário está ocupado
     return agendamentoRepository.findByData(dataHora).isEmpty();
 }
+
+public List<String> buscarHorariosOcupadosPorData(LocalDate data) {
+        // Define o intervalo do dia inteiro
+        LocalDateTime inicioDia = data.atStartOfDay();
+        LocalDateTime fimDia = data.atTime(23, 59, 59);
+
+        List<Agendamento> agendamentos = agendamentoRepository.findByDataBetween(inicioDia, fimDia);
+
+        // Filtra não cancelados e mapeia para o horário
+        return agendamentos.stream()
+                .filter(agendamento -> !agendamento.getStatus().equals(Status.CANCELADO))
+                .map(agendamento -> agendamento.getData().toLocalTime().toString())  // Exemplo: "14:00"
+                .collect(Collectors.toList());
+    }
 
     
 }

@@ -1,7 +1,12 @@
 package com.AgendamentoOn.Controller;
 
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.AgendamentoOn.Model.Agendamento;
@@ -56,15 +62,22 @@ public class AgendaController {
 
     // Criar novo agendamento associando automaticamente o cliente autenticado
     @PostMapping("/novo")
-    @ResponseBody
-    public ResponseEntity<?> novoAgendamento(@RequestBody Agendamento agendamento) {
-        Usuario usuario = getUsuarioAutenticado();
-        agendamento.setCliente(usuario); // associar o cliente autenticado
-        Agendamento salvo = agendamentoService.saveAgendamento(agendamento);
-        System.out.println("Novo agendamento criado pelo cliente ID: " + usuario.getId());
-        System.out.println(salvo);
-        return ResponseEntity.ok(salvo);
-    }
+@ResponseBody
+public ResponseEntity<?> novoAgendamento(@RequestBody Agendamento agendamento) {
+    Usuario usuario = getUsuarioAutenticado();
+    agendamento.setCliente(usuario); // associar o cliente autenticado
+    Agendamento salvo = agendamentoService.saveAgendamento(agendamento);
+
+    System.out.println("ID do agendamento: " + salvo.getId());
+    System.out.println("Cliente ID: " + (salvo.getCliente() != null ? salvo.getCliente().getId() : "null"));
+    System.out.println("Cliente Nome: " + (salvo.getCliente() != null ? salvo.getCliente().getNome() : "null"));
+    System.out.println("Data: " + salvo.getData());
+    System.out.println("Status: " + salvo.getStatus());
+    System.out.println("Especialidade: " + salvo.getEspecialidade());
+
+    return ResponseEntity.ok(salvo);
+}
+
 
     // Excluir agendamento, mas apenas se pertencer ao cliente autenticado
     @PutMapping("/{id}/cancelar")
@@ -94,6 +107,35 @@ public class AgendaController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    @GetMapping("/api/blocked-dates")
+public ResponseEntity<Map<String, List<String>>> getDatasBloqueadas(
+        @RequestParam int year,
+        @RequestParam int month) {
+    try {
+        // Chama o service que retorna List<LocalDate>
+        List<LocalDate> datas = agendamentoService.buscarDatasBloqueadasNoMes(year, month);
+
+        // Converte para String no formato ISO (yyyy-MM-dd)
+        List<String> datasFormatadas = datas.stream()
+                .map(LocalDate::toString)
+                .collect(Collectors.toList());
+
+        System.out.println("Datas bloqueadas enviadas para o front-end:");
+        datasFormatadas.forEach(System.out::println);
+
+        // Retorna um JSON com chave 'blockedDates'
+        Map<String, List<String>> response = new HashMap<>();
+        response.put("blockedDates", datasFormatadas);
+
+        return ResponseEntity.ok(response);
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Collections.singletonMap("blockedDates", Collections.emptyList()));
+    }
+}
+
 
     // Atualizar perfil do usuário autenticado (senha tratada na service)
     @PutMapping("/usuario/perfil")
@@ -148,5 +190,18 @@ public ResponseEntity<?> getPerfil() {
         return "agendaAdmin";  // agendaAdmin.html em src/main/resources/templates
     }
     
+@GetMapping("/horarios-ocupados")
+public ResponseEntity<Map<String, List<String>>> getHorariosOcupados(@RequestParam String data) {
+    LocalDate localDate = LocalDate.parse(data);
+
+    // CHAMADA CERTA:
+    List<String> horariosOcupados = agendamentoService.buscarHorariosOcupadosPorData(localDate);
+
+    Map<String, List<String>> response = new HashMap<>();
+    response.put("horariosOcupados", horariosOcupados);
+
+    return ResponseEntity.ok(response);
+}
+
 
 }

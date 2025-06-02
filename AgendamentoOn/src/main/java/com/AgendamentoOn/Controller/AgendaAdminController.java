@@ -5,18 +5,17 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -53,62 +52,80 @@ public class AgendaAdminController {
 
     // Método que retorna JSON - usuario logado
     @GetMapping("/api/usuario-logado")
-    @ResponseBody
-    public Usuario getUsuarioLogado(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        if (userDetails == null) {
-            return null;
-        }
-        Usuario usuario = userDetails.getUsuario();
-        usuario.setSenha(null);
-        return usuario;
-    }
-
-    @GetMapping("/api/admin/agendamentos/todos")
 @ResponseBody
-public List<Agendamento> listarTodosAgendamentos() {
-    return agendamentoService.listarTodos();
-}
-
-    @PutMapping("/usuario-logado")
-@ResponseBody
-public ResponseEntity<Usuario> atualizarUsuarioLogado(
-        @AuthenticationPrincipal CustomUserDetails userDetails,
-        @RequestBody Usuario dadosAtualizados) {
-
+public ResponseEntity<Usuario> getUsuarioLogado(@AuthenticationPrincipal CustomUserDetails userDetails) {
     if (userDetails == null) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
-
-    Long usuarioId = userDetails.getUsuario().getId();
-    Usuario usuarioAtualizado = usuarioService.atualizarUsuarioLogado(usuarioId, dadosAtualizados);
-    usuarioAtualizado.setSenha(null);
-    return ResponseEntity.ok(usuarioAtualizado);
+    Usuario usuario = userDetails.getUsuario();
+    return ResponseEntity.ok(usuario);
 }
 
-    @GetMapping("/api/admin/agendamentos")
+@GetMapping("/api/admin/agendamentos/todos")
+@ResponseBody
+public List<Agendamento> listarTodosAgendamentos() {
+    List<Agendamento> agendamentos = agendamentoService.listarTodos();
+
+    // Ordena da data mais recente para a mais antiga
+    agendamentos.sort(Comparator.comparing(Agendamento::getData).reversed());
+
+    return agendamentos;
+}
+
+ // Atualizar perfil do usuário autenticado (senha tratada na service)
+    @PutMapping("/usuario/perfil")
+    @ResponseBody
+    public ResponseEntity<?> atualizarPerfil(@RequestBody Usuario usuarioAtualizado) {
+        try {
+            Usuario usuario = getUsuarioAutenticado();
+            if (usuario == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não autenticado");
+            }
+
+            usuarioAtualizado.setId(usuario.getId()); // garante que atualizará o usuário correto
+            Usuario usuarioAtualizadoSalvo = usuarioService.atualizar(usuarioAtualizado);
+
+            if (usuarioAtualizadoSalvo == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado para atualização");
+            }
+
+            return ResponseEntity.ok(usuarioAtualizadoSalvo);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao atualizar perfil");
+        }
+    }
+
+     // Método utilitário para obter o usuário autenticado
+    private Usuario getUsuarioAutenticado() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof CustomUserDetails) {
+            return ((CustomUserDetails) principal).getUsuario();
+        }
+        return null;
+    }
+
+
+@GetMapping("/api/admin/agendamentos")
 @ResponseBody
 public List<Agendamento> listarAgendamentosUltimos30Dias() {
     List<Agendamento> agendamentos = agendamentoService.listarAgendamentosUltimos30Dias();
 
-    // Verificar duplicados por id
-    Set<Long> idsVistos = new HashSet<>();
-    Set<Long> idsDuplicados = new HashSet<>();
+    // Ordena da data mais recente para a mais antiga
+    agendamentos.sort(Comparator.comparing(Agendamento::getData).reversed());
 
+    System.out.println("Agendamentos encontrados nos últimos 30 dias:");
     for (Agendamento ag : agendamentos) {
-        Long id = ag.getId();
-        if (!idsVistos.add(id)) {
-            idsDuplicados.add(id);
-        }
-    }
-
-    if (!idsDuplicados.isEmpty()) {
-        System.out.println("Duplicados encontrados nos agendamentos para IDs: " + idsDuplicados);
-    } else {
-        System.out.println("Nenhum duplicado encontrado nos agendamentos.");
+        System.out.println(ag);
     }
 
     return agendamentos;
 }
+
 
     // Listar clientes - JSON
     @GetMapping("/api/admin/clientes")
@@ -197,22 +214,28 @@ public ResponseEntity<?> verificarDisponibilidade(
     }
 }
 
-    @GetMapping("/bloqueados")
-        public ResponseEntity<List<String>> getDatasBloqueadas(
-                @RequestParam int year,
-                @RequestParam int month) {
-            try {
-                List<LocalDate> datas = agendamentoService.buscarDatasBloqueadasNoMes(year, month);
-                List<String> datasFormatadas = datas.stream()
-                        .map(LocalDate::toString) // yyyy-MM-dd
-                        .collect(Collectors.toList());
-                return ResponseEntity.ok(datasFormatadas);
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(Collections.emptyList());
-            }
-        }
-        
+@GetMapping("/api/blocked-dates")
+public ResponseEntity<List<String>> getDatasBloqueadas(
+        @RequestParam int year,
+        @RequestParam int month) {
+    try {
+        List<LocalDate> datas = agendamentoService.buscarDatasBloqueadasNoMes(year, month);
+        List<String> datasFormatadas = datas.stream()
+                .map(LocalDate::toString) // yyyy-MM-dd
+                .collect(Collectors.toList());
 
+        // Log para validar as datas bloqueadas
+        System.out.println("Datas bloqueadas enviadas para o front-end:");
+        datasFormatadas.forEach(data -> System.out.println(data));
+
+        return ResponseEntity.ok(datasFormatadas);
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Collections.emptyList());
+    }
+}
+
+ 
 
 }

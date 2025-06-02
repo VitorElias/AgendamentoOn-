@@ -88,6 +88,14 @@
         line-height: 2rem;
       }
 
+      .calendar-day.blocked {
+  color: #a00;              /* Vermelho escuro para avisar */
+  text-decoration: line-through; /* Linha riscada */
+  cursor: not-allowed;      /* Cursor proibido */
+  opacity: 0.6;             /* Um pouco transparente */
+  pointer-events: none;     /* Desabilita eventos de clique */
+}
+
       .calendar-day:hover {
         background-color: #f3e6ea;
       }
@@ -193,9 +201,6 @@
           <a href="#" class="active" data-section="agenda"
             ><i class="fa-regular fa-calendar-days"></i> Agenda</a
           >
-          <a href="#" data-section="agendamentos"
-            ><i class="fa-regular fa-clock"></i> Meus Agendamentos</a
-          >
           <a href="#" data-section="servicos"
             ><i class="fa-solid fa-spa"></i> Serviços</a
           >
@@ -260,7 +265,7 @@
           </div>
 
           <button
-                  id="btnBloquearData"
+                  id="btnAgendamento"
                   class="btn btn-confirm ms-2"
                   style="background-color: #e91e63; color: white;"
                   onclick="window.location.href='/api/agenda'"
@@ -872,138 +877,84 @@
           </div>
         </section>
 
-        <!-- Seção Meu Perfil -->
-        <section id="sec-perfil" style="display: none">
-          <div class="container-fluid">
-            <div class="row">
-              <div class="col">
-                <h3 class="fw-bold mb-4" style="color: #985d78">Meu Perfil</h3>
+         <!-- Seção Meu Perfil -->
+      <section id="sec-perfil" style="display: none;"> <!-- deixe visível -->
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col">
+        <h3 class="fw-bold mb-4" style="color: #985D78;">Meu Perfil</h3>
 
-                <div
-                  class="bg-white p-4 rounded-3 shadow-sm w-100"
-                  style="max-width: 1000px"
-                >
-                  <div class="row mb-3">
-                    <div class="col-md-2 fw-semibold">Nome:</div>
-                    <div class="col-md-10" id="perfilNome">Carregando...</div>
-                  </div>
-
-                  <div class="row mb-3">
-                    <div class="col-md-2 fw-semibold">E-mail:</div>
-                    <div class="col-md-10" id="perfilEmail">Carregando...</div>
-                  </div>
-
-                  <div class="row mb-3">
-                    <div class="col-md-2 fw-semibold">Telefone:</div>
-                    <div class="col-md-10" id="perfilTelefone">
-                      Carregando...
-                    </div>
-                  </div>
-                </div>
-
-                <div class="text-end mt-3" style="max-width: 1000px">
-                  <button
-                    id="btnEditarPerfil"
-                    class="btn fw-semibold text-white px-4 py-2"
-                    style="background-color: #985d78"
-                  >
-                    Alterar Dados do Perfil
-                  </button>
-                </div>
-              </div>
-            </div>
+        <div class="bg-white p-4 rounded-3 shadow-sm w-100" style="max-width: 1000px;">
+          <div class="row mb-3">
+            <div class="col-md-2 fw-semibold">Nome:</div>
+            <div class="col-md-10" id="perfilNome">...</div>
           </div>
-        </section>
 
-        <!-- Seção Alterar Dados do Perfil -->
-        <section id="sec-perfil-editar" style="display: none">
-          <div
-            class="d-flex justify-content-center align-items-start"
-            style="min-height: calc(100vh - 100px); padding-top: 2rem"
-          >
-            <div style="width: 100%; max-width: 700px">
-              <h3 class="fw-bold mb-4" style="color: #985d78">
-                Meu Perfil / Alterar Dados
-              </h3>
-
-              <div class="bg-white p-4 rounded-3 shadow-sm">
-                <div class="mb-3">
-                  <label class="form-label fw-semibold">Nome</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="editarNome"
-                    placeholder="Digite seu nome"
-                    required
-                    minlength="3"
-                  />
-                </div>
-
-                <div class="mb-3">
-                  <label class="form-label fw-semibold">E-mail</label>
-                  <input
-                    type="email"
-                    class="form-control"
-                    id="editarEmail"
-                    placeholder="Digite seu e-mail"
-                    required
-                  />
-                </div>
-
-                <div class="mb-3">
-                  <label class="form-label fw-semibold">Senha</label>
-                  <input
-                    type="password"
-                    class="form-control"
-                    id="editarSenha"
-                    placeholder="Senha deve ter no mínimo 4 caracteres"
-                    minlength="4"
-                  />
-                </div>
-
-                <div class="mb-3">
-                  <label class="form-label fw-semibold">Confirme a senha</label>
-                  <input
-                    type="password"
-                    class="form-control"
-                    id="editarSenhaConfirmar"
-                    placeholder="Digite novamente sua senha"
-                    minlength="4"
-                  />
-                </div>
-
-                <div class="mb-4">
-                  <label class="form-label fw-semibold">Telefone</label>
-                  <input
-                    type="tel"
-                    class="form-control"
-                    id="editarTelefone"
-                    placeholder="(DDD) 91234-5678"
-                    pattern="^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$"
-                    required
-                  />
-                </div>
-
-                <div class="d-flex gap-2">
-                  <button
-                    id="btnAtualizarPerfil"
-                    class="btn w-100 fw-bold text-white"
-                    style="background-color: #22c55e"
-                  >
-                    Atualizar Dados do Perfil
-                  </button>
-                  <button
-                    id="btnVoltarPerfil"
-                    class="btn w-100 fw-bold text-white"
-                    style="background-color: #cbd5e1"
-                  >
-                    Voltar
-                  </button>
-                </div>
-              </div>
-            </div>
+          <div class="row mb-3">
+            <div class="col-md-2 fw-semibold">E-mail:</div>
+            <div class="col-md-10" id="perfilEmail">...</div>
           </div>
-        </section>
+
+          <div class="row mb-3">
+            <div class="col-md-2 fw-semibold">Telefone:</div>
+            <div class="col-md-10" id="perfilTelefone">...</div>
+          </div>
+        </div>
+
+        <div class="text-end mt-3" style="max-width: 1000px;">
+          <button id="btnEditarPerfil" class="btn fw-semibold text-white px-4 py-2" style="background-color: #985D78;">
+            Alterar Dados do Perfil
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Seção Alterar Dados do Perfil -->
+<section id="sec-perfil-editar" style="display: none;">
+  <div class="d-flex justify-content-center align-items-start" style="min-height: calc(100vh - 100px); padding-top: 2rem;">
+    <div style="width: 100%; max-width: 700px;">
+      <h3 class="fw-bold mb-4" style="color: #985D78;">Meu Perfil / Alterar Dados</h3>
+
+      <div class="bg-white p-4 rounded-3 shadow-sm">
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="inputNome">Nome</label>
+          <input type="text" id="inputNome" class="form-control" placeholder="Digite seu nome" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="inputEmail">E-mail</label>
+          <input type="email" id="inputEmail" class="form-control" placeholder="Digite seu e-mail" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="inputSenha">Senha</label>
+          <input type="password" id="inputSenha" class="form-control" placeholder="Senha deve ter no mínimo 8 caracteres" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="inputConfirmaSenha">Confirme a senha</label>
+          <input type="password" id="inputConfirmaSenha" class="form-control" placeholder="Digite novamente sua senha" />
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label fw-semibold" for="inputTelefone">Telefone</label>
+          <input type="text" id="inputTelefone" class="form-control" placeholder="(DDD) 91234-5678" />
+        </div>
+
+        <div class="d-flex gap-2">
+          <button id="btnAtualizarPerfil" class="btn w-100 fw-bold text-white" style="background-color: #22C55E;">
+            Atualizar Dados do Perfil
+          </button>
+          <button id="btnVoltarPerfil" class="btn w-100 fw-bold text-white" style="background-color: #cbd5e1;">
+            Voltar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 
         <!-- Seção Dashboard - ADMIN -->
         <section id="sec-dashboard" style="display: none">
@@ -1228,6 +1179,8 @@
         </section>
       </div>
     </div>
+
+
 
     <script>
 
@@ -1734,106 +1687,128 @@ document.querySelector("#btnBloquearData").addEventListener("click", () => {
         document.getElementById("sec-perfil-editar").style.display = "block";
 
     } catch (error) {
-        alert("Erro ao carregar dados do usuário: " + error.message);
+                console.log(error.message);
+
     }
 });
 
 
-        // Calendário
-        const calendarBody = document.getElementById("calendarBody");
-        const monthYear = document.getElementById("monthYear");
-        const prevMonthBtn = document.getElementById("prevMonth");
-        const nextMonthBtn = document.getElementById("nextMonth");
+ async function fetchBlockedDates(year, month) {
+    const response = await fetch(`/api/blocked-dates?year=${year}&month=${month + 1}`);
+    const data = await response.json();
+    console.log("Bloqueadas recebidas do backend:", data);
+    return data;  // <-- AQUI: já é um array de strings
+}
 
-        let selectedDate = null;
-        let currentDate = new Date();
+  // Calendário
+  const calendarBody = document.getElementById("calendarBody");
+  const monthYear = document.getElementById("monthYear");
+  const prevMonthBtn = document.getElementById("prevMonth");
+  const nextMonthBtn = document.getElementById("nextMonth");
 
-       function renderCalendar(date) {
-        const year = date.getFullYear();
-        const month = date.getMonth();
-        const firstDay = new Date(year, month, 1).getDay();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
+  let selectedDate = null;
+  let currentDate = new Date();
 
-        const nomeMes = date.toLocaleString("pt-BR", { month: "long" });
-        if (monthYear) {
-          monthYear.innerHTML = `<span>${nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1)
-            }</span> <span>${year}</span>`;
-        }
+  async function renderCalendar(date) {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-        if (!calendarBody) return;
-        calendarBody.innerHTML = "";
-        let row = document.createElement("tr");
+    const nomeMes = date.toLocaleString("pt-BR", { month: "long" });
+    if (monthYear) {
+      monthYear.innerHTML = `<span>${nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1)}</span> <span>${year}</span>`;
+    }
 
-        for (let i = 0; i < firstDay; i++) {
-          row.appendChild(document.createElement("td"));
-        }
+    if (!calendarBody) return;
+    calendarBody.innerHTML = "";
 
-        for (let day = 1; day <= daysInMonth; day++) {
-          if (row.children.length === 7) {
-            calendarBody.appendChild(row);
-            row = document.createElement("tr");
-          }
+    // Busca os dias bloqueados para este mês
+    const blockedDates = await fetchBlockedDates(year, month);
 
-          const cell = document.createElement("td");
-          const span = document.createElement("span");
-          span.classList.add("calendar-day");
-          span.textContent = day;
+    let row = document.createElement("tr");
 
-          if (
-            selectedDate &&
-            selectedDate.getDate() === day &&
-            selectedDate.getMonth() === month &&
-            selectedDate.getFullYear() === year
-          ) {
-            span.classList.add("selected");
-          }
+    // Preenche os dias vazios antes do primeiro dia do mês
+    for (let i = 0; i < firstDay; i++) {
+      row.appendChild(document.createElement("td"));
+    }
 
-          span.addEventListener("click", () => {
-            const clickedDate = new Date(year, month, day);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0); // Zera hora para comparar só a data
-
-            if (clickedDate < today) {
-              alert("Você não pode selecionar uma data que já passou.");
-              return;
-            }
-
-            selectedDate = clickedDate;
-            renderCalendar(currentDate);
-          });
-
-          cell.appendChild(span);
-          row.appendChild(cell);
-        }
-
-        if (row.children.length > 0) {
-          calendarBody.appendChild(row);
-        }
+    for (let day = 1; day <= daysInMonth; day++) {
+      if (row.children.length === 7) {
+        calendarBody.appendChild(row);
+        row = document.createElement("tr");
       }
 
-        if (prevMonthBtn) {
-          prevMonthBtn.addEventListener("click", () => {
-            currentDate.setMonth(currentDate.getMonth() - 1);
-            renderCalendar(currentDate);
-          });
-        }
+      const cell = document.createElement("td");
+      const span = document.createElement("span");
+      span.classList.add("calendar-day");
+      span.textContent = day;
 
-        if (nextMonthBtn) {
-          nextMonthBtn.addEventListener("click", () => {
-            currentDate.setMonth(currentDate.getMonth() + 1);
-            renderCalendar(currentDate);
-          });
-        }
+      const dateStr = new Date(year, month, day).toISOString().slice(0, 10);
 
-        renderCalendar(currentDate);
-      });
+      if (blockedDates.includes(dateStr)) {
+           console.log("Dia bloqueado: ", dateStr);
+
+        span.classList.add("blocked");
+        // Sem evento de clique para dias bloqueados
+      } else {
+        span.addEventListener("click", () => {
+          const clickedDate = new Date(year, month, day);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          if (clickedDate < today) {
+            alert("Você não pode selecionar uma data que já passou.");
+            return;
+          }
+
+          selectedDate = clickedDate;
+          renderCalendar(currentDate);
+        });
+      }
+
+      if (
+        selectedDate &&
+        selectedDate.getDate() === day &&
+        selectedDate.getMonth() === month &&
+        selectedDate.getFullYear() === year
+      ) {
+        span.classList.add("selected");
+      }
+
+      cell.appendChild(span);
+      row.appendChild(cell);
+    }
+
+    if (row.children.length > 0) {
+      calendarBody.appendChild(row);
+    }
+  }
+
+  if (prevMonthBtn) {
+    prevMonthBtn.addEventListener("click", () => {
+      currentDate.setMonth(currentDate.getMonth() - 1);
+      renderCalendar(currentDate);
+    });
+  }
+
+  if (nextMonthBtn) {
+    nextMonthBtn.addEventListener("click", () => {
+      currentDate.setMonth(currentDate.getMonth() + 1);
+      renderCalendar(currentDate);
+    });
+  }
+
+  renderCalendar(currentDate);
+
+}); 
 
       document.addEventListener("DOMContentLoaded", () => {
         const btnSair = document.getElementById("btnSair");
         if (btnSair) {
           btnSair.addEventListener("click", () => {
             // Redirecionar para a landing page
-            window.location.href = "../index.html"; // ou apenas "index.html" se não estiver em subpasta
+            window.location.href = "/logout"; // ou apenas "index.html" se não estiver em subpasta
           });
         }
       });
@@ -1866,9 +1841,13 @@ async function atualizarDashboard() {
 
   try {
     const response = await fetch('/api/admin/agendamentos');
-    if (!response.ok) throw new Error('Erro ao carregar agendamentos');
+  if (!response.ok) throw new Error('Erro ao carregar agendamentos');
 
-    const agendamentos = await response.json();
+  const agendamentos = await response.json();
+
+  const agendamentosPassados = agendamentos.filter(ag => new Date(ag.data) < new Date());
+  console.log("Agendamentos passados:", agendamentosPassados);
+  console.table(agendamentosPassados);
 
     const agora = new Date();
     const mesAtual = agora.getMonth();
@@ -1929,6 +1908,8 @@ async function atualizarDashboard() {
     const clientesUnicos = new Set(
       agendamentosConcluidos.map(ag => ag.cliente?.email || ag.cliente?.id || ag.cliente?.nome)
     );
+
+console.log("Clientes nos agendamentos concluídos:", agendamentosConcluidos.map(ag => ag.cliente));
 
     totalClientesSpan.textContent = clientesUnicos.size;
 
@@ -2054,45 +2035,77 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // ✅ Atualizar Dashboard
-    atualizarDashboard();
+async function carregarPerfil() {
+    try {
+        const response = await fetch('/api/usuario-logado');
+        if (!response.ok) throw new Error("Erro ao buscar dados do usuário");
 
-   document.addEventListener("DOMContentLoaded", () => {
-  const btnAtualizarPerfil = document.querySelector("#sec-perfil-editar button.btn");
-  if (btnAtualizarPerfil) {
-    btnAtualizarPerfil.addEventListener("click", async () => {
-      const nome = document.getElementById("editarNome").value;
-      const email = document.getElementById("editarEmail").value;
-      const telefone = document.getElementById("editarTelefone").value;
+        const usuario = await response.json();
 
-      try {
-        const updateResponse = await fetch('/usuario-logado', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nome, email, telefone })
-        });
-
-        if (!updateResponse.ok) throw new Error('Erro ao atualizar perfil');
-
-        const updatedUser = await updateResponse.json();
-        alert('Perfil atualizado com sucesso!');
-
-        document.getElementById("perfilNome").textContent = usuarioAtualizadoResposta.nome || "Não informado";
-document.getElementById("perfilEmail").textContent = usuarioAtualizadoResposta.email || "Não informado";
-document.getElementById("perfilTelefone").textContent = usuarioAtualizadoResposta.telefone || "Não informado";
+       document.getElementById("inputNome").value = usuario.nome || "";
+        document.getElementById("inputEmail").value = usuario.email || "";
+        document.getElementById("inputTelefone").value = usuario.telefone || "";
 
 
-        // Atualiza elementos na tela (se tiver esses elementos para mostrar os dados)
-        document.getElementById("perfilNome").textContent = updatedUser.nome;
-        document.getElementById("perfilEmail").textContent = updatedUser.email;
-        document.getElementById("perfilTelefone").textContent = updatedUser.telefone;
+    } catch (error) {
+        console.log(error.message);
+    }
+}
 
-      } catch (error) {
-        console.error("Erro ao atualizar perfil:", error);
-        alert("Erro ao atualizar perfil.");
-      }
-    });
+// Atualizar perfil
+document.getElementById('btnAtualizarPerfil').addEventListener('click', () => {
+  const nome = document.getElementById('inputNome').value.trim();
+  const email = document.getElementById('inputEmail').value.trim();
+  const senha = document.getElementById('inputSenha').value;
+  const confirmaSenha = document.getElementById('inputConfirmaSenha').value;
+  const telefone = document.getElementById('inputTelefone').value.trim();
+
+  if (senha && senha.length < 8) {
+    alert("Senha deve ter no mínimo 8 caracteres");
+    return;
   }
+
+  if (senha !== confirmaSenha) {
+    alert("As senhas não coincidem!");
+    return;
+  }
+
+  const dadosAtualizados = { nome, email, telefone };
+  if (senha) dadosAtualizados.senha = senha;
+
+  fetch('/api/agenda/usuario/perfil', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(dadosAtualizados)
+  })
+    .then(res => {
+      if (!res.ok) throw new Error('Erro ao atualizar perfil');
+      return res.json();
+    })
+    .then(data => {
+  alert('Perfil atualizado com sucesso!');
+  usuarioPerfil = data;
+
+  // Atualiza direto os elementos visuais:
+  document.getElementById('perfilNome').textContent = usuarioPerfil.nome;
+  document.getElementById('perfilEmail').textContent = usuarioPerfil.email;
+  document.getElementById('perfilTelefone').textContent = usuarioPerfil.telefone;
+
+  // Volta para visualização
+  document.getElementById('sec-perfil-editar').style.display = 'none';
+  document.getElementById('sec-perfil').style.display = 'block';
+})
+    .catch(err => {
+      console.error('Erro ao atualizar perfil:', err);
+      alert('Erro ao atualizar perfil: ' + err.message);
+    });
 });
+
+// Carregar o perfil ao iniciar
+carregarPerfil();
+
 
   // Listener dos links da sidebar para troca de seções
   document.querySelectorAll(".sidebar a[data-section]").forEach(el => {
@@ -2324,11 +2337,18 @@ document.getElementById("btnAtualizarStatus").addEventListener("click", async ()
             localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
         }
 
-        alert("Status atualizado com sucesso!");
+        if (novoStatus === "CONCLUIDO") {
+            alert("✅ O atendimento foi concluído com sucesso!");
+        } else {
+            alert("Status atualizado com sucesso!");
+        }
+        window.location = window.location.href;
         document.getElementById("statusSelecionado").value = novoStatus;
+
     } else {
         alert("Agendamento não encontrado para atualização.");
     }
+
 });
 
 
@@ -2350,38 +2370,13 @@ document.getElementById("btnVoltarHistorico").addEventListener("click", () => {
   document.getElementById("sec-historico-agendamentos").style.display = "block";
 });
 
-document.getElementById("btnBloquearData").addEventListener("click", () => {
-  if (!selectedDate) {
-    alert("Selecione uma data no calendário para bloquear.");
-    return;
-  }
+const bootstrapModal = new bootstrap.Modal(document.getElementById('customAlertModal'));
 
-  const dataBloqueada = selectedDate.toISOString().split("T")[0]; // Formato: AAAA-MM-DD
-  let datasBloqueadas = JSON.parse(localStorage.getItem("datasBloqueadas")) || [];
-
-  if (datasBloqueadas.includes(dataBloqueada)) {
-    alert("Esta data já está bloqueada.");
-    return;
-  }
-
-  datasBloqueadas.push(dataBloqueada);
-  localStorage.setItem("datasBloqueadas", JSON.stringify(datasBloqueadas));
-
-  alert("Data bloqueada com sucesso!");
-  renderCalendar(currentDate); // Re-renderiza o calendário
-});
-
-         document.addEventListener("DOMContentLoaded", () => {
-  const btnAtualizarPerfil = document.getElementById("btnAtualizarPerfil");
-  if (btnAtualizarPerfil) {
-    btnAtualizarPerfil.addEventListener("click", async (e) => {
-      e.preventDefault();  // evita o submit padrão se for dentro de form
-      await atualizarPerfil();
-    });
-  }
-});
-
-
+window.alert = function(msg) {
+  const modalBody = document.getElementById('customAlertBody');
+  modalBody.textContent = msg;
+  bootstrapModal.show();
+}
 
 
 

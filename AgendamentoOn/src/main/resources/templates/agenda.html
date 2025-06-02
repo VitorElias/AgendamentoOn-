@@ -43,6 +43,13 @@
       text-decoration: none;
     }
 
+    .blocked {
+  background-color: #f8d7da;
+  color: #721c24;
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: 0.6;
+}
     .sidebar a.active,
     .sidebar a:hover {
       background-color: #ffffff;
@@ -55,6 +62,16 @@
       font-size: 0.85rem;
       text-decoration: none;
     }
+
+    .horario-bloqueado {
+  background-color: #dc3545 !important; /* vermelho */
+  color: white !important;
+  text-decoration: line-through;
+  cursor: not-allowed;
+  opacity: 0.7;
+  pointer-events: none; /* bloqueia clique */
+}
+
 
     .btn-sair {
       background-color: #f1f5f9;
@@ -234,16 +251,16 @@
             <div class="bg-white p-4 rounded-3 shadow-sm">
               <div class="mb-4">
                 <label for="servicoSelect" class="form-label fw-semibold">Escolha um serviço para o agendamento:</label>
-                <select id="servicoSelect" class="form-select" aria-label="Selecione o serviço desejado">
-                  <option selected disabled>Selecione as opções</option>
-                  <option>Cílios: Volume brasileiro</option>
-                  <option>Cílios: Efeito fox</option>
-                  <option>Cílios: Efeito Molhado</option>
-                  <option>Cílios: Volume 5D</option>
-                  <option>Sobrancelhas: Design de sobrancelhas</option>
-                  <option>Sobrancelhas: Design com henna</option>
-                  <option>Sobrancelhas: Brow lamination</option>
-                  <option>Sobrancelhas: Lash lifting</option>
+               <select id="servicoSelect" class="form-select" aria-label="Selecione o serviço desejado">
+                <option selected disabled value="">Selecione as opções</option>
+                <option value="0">Cílios: Volume brasileiro</option>
+                <option value="1">Cílios: Efeito fox</option>
+                <option value="2">Cílios: Efeito Molhado</option>
+                <option value="3">Cílios: Volume 5D</option>
+                <option value="4">Sobrancelhas: Design de sobrancelhas</option>
+                <option value="5">Sobrancelhas: Design com henna</option>
+                <option value="6">Sobrancelhas: Brow lamination</option>
+                <option value="7">Sobrancelhas: Lash lifting</option>
                 </select>
               </div>
 
@@ -274,7 +291,7 @@
 
             <div class="bg-white p-4 rounded-3 shadow-sm w-100" style="max-width: 720px;">
               <label class="form-label fw-semibold mb-3">Escolha um horário para o agendamento:</label>
-              <div class="row row-cols-3 g-3">
+              <div  id="listaHorarios" class="row row-cols-3 g-3">
                 <!-- Horários -->
                 <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">14:00</button></div>
                 <div class="col"><button class="btn btn-outline-secondary horario-opcao w-100">14:30</button></div>
@@ -740,35 +757,64 @@
         document.querySelectorAll("section[id^='sec-']").forEach(sec => sec.style.display = "none");
         document.getElementById("sec-agendar-horario").style.display = "block";
 
-        gerarHorarios();
+         const dataISO = selectedDate.toISOString().split('T')[0]; // Formato yyyy-MM-dd
+        gerarHorarios(dataISO);
       });
 
-      function gerarHorarios() {
-        const horarios = [
-          "14:00", "14:30", "15:00",
-          "15:30", "16:00", "16:30",
-          "17:00", "18:00", "18:30",
-          "19:00", "19:30", "20:00",
-          "20:30", "21:00", "21:30"
-        ];
+     
 
-        const container = document.getElementById("listaHorarios");
-        container.innerHTML = "";
+      async function gerarHorarios(data) {
+  if (!data) {
+    console.error("Data inválida para gerar horários");
+    return;
+  }
 
-        horarios.forEach(horario => {
-          const btn = document.createElement("button");
-          btn.className = "btn btn-outline-secondary horario-opcao";
-          btn.textContent = horario;
-          btn.setAttribute("type", "button");
-          btn.setAttribute("aria-label", `Selecionar horário ${horario}`);
-          btn.addEventListener("click", () => {
-            document.querySelectorAll(".horario-opcao").forEach(b => b.classList.remove("btn-primary", "text-white"));
-            btn.classList.add("btn-primary", "text-white");
-            btn.dataset.selected = "true";
-          });
-          container.appendChild(btn);
+  const horarios = [
+    "14:00", "14:30", "15:00",
+    "15:30", "16:00", "16:30",
+    "17:00", "18:00", "18:30",
+    "19:00", "19:30", "20:00",
+    "20:30", "21:00", "21:30"
+  ];
+
+  const container = document.getElementById("listaHorarios");
+  container.innerHTML = "";
+
+  try {
+    const response = await fetch(`/api/agenda/horarios-ocupados?data=${data}`);
+    if (!response.ok) throw new Error("Erro ao buscar horários ocupados");
+
+    const result = await response.json();
+    const horariosOcupados = result.horariosOcupados || [];
+
+    horarios.forEach(horario => {
+      const colDiv = document.createElement("div");
+      colDiv.className = "col";
+
+      const btn = document.createElement("button");
+      btn.className = "btn btn-outline-secondary horario-opcao w-100";
+      btn.textContent = horario;
+
+      if (horariosOcupados.includes(horario)) {
+        btn.disabled = true;
+        btn.classList.add("horario-bloqueado");
+      } else {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".horario-opcao").forEach(b => b.classList.remove("btn-primary", "text-white"));
+          btn.classList.add("btn-primary", "text-white");
+          btn.dataset.selected = "true";
         });
       }
+
+      colDiv.appendChild(btn);
+      container.appendChild(colDiv);
+    });
+  } catch (error) {
+    console.error(error);
+    container.innerHTML = "<p>Erro ao carregar horários.</p>";
+  }
+}
+
 
       document.getElementById("btnVoltarParaServico").addEventListener("click", () => {
         document.getElementById("sec-agendar-horario").style.display = "none";
@@ -879,15 +925,14 @@
       });
 
       btnOkSucesso.addEventListener("click", () => {
-        adicionarAgendamento(servicoSelecionado, dataSelecionada, horarioSelecionado);
+  // ✅ Só troca de tela, sem enviar de novo!
+  document.querySelectorAll("section[id^='sec-']").forEach(sec => sec.style.display = "none");
+  document.getElementById("sec-agendamentos").style.display = "block";
 
-        document.querySelectorAll("section[id^='sec-']").forEach(sec => sec.style.display = "none");
-        document.getElementById("sec-agendamentos").style.display = "block";
-
-        document.querySelectorAll(".sidebar a").forEach(link => link.classList.remove("active"));
-        const linkAgendamentos = document.querySelector('.sidebar a[data-section="agendamentos"]');
-        if (linkAgendamentos) linkAgendamentos.classList.add("active");
-      });
+  document.querySelectorAll(".sidebar a").forEach(link => link.classList.remove("active"));
+  const linkAgendamentos = document.querySelector('.sidebar a[data-section="agendamentos"]');
+  if (linkAgendamentos) linkAgendamentos.classList.add("active");
+});
 
       // Botão "+ Novo Agendamento"
       const btnNovoAgendamento = document.getElementById("btnNovoAgendamento");
@@ -908,15 +953,50 @@
 
       let agendamentos = [];
 
-      function adicionarAgendamento(servico, data, horario) {
-        const novo = { servico, data, horario, status: 'AGENDADO' };
-        agendamentos.push(novo);
-        enviarAgendamento(novo);
-        atualizarListaAgendamentos();
-      }
+function converterDataTextoParaISO(dataTexto, horarioTexto) {
+  const meses = {
+    janeiro: "01", fevereiro: "02", março: "03", abril: "04",
+    maio: "05", junho: "06", julho: "07", agosto: "08",
+    setembro: "09", outubro: "10", novembro: "11", dezembro: "12"
+  };
+
+  const partes = dataTexto.toLowerCase().split(" de ");
+  const dia = partes[0].padStart(2, "0");
+  const mes = meses[partes[1]];
+  const ano = partes[2];
+
+  const dataISO = `${ano}-${mes}-${dia}T${horarioTexto}:00`;
+  return dataISO;
+}
+
+      function adicionarAgendamento(servico, dataTexto, horarioTexto) {
+  const dataISO = converterDataTextoParaISO(dataTexto, horarioTexto);
+
+  const novo = {
+    servico,
+    data: dataISO,  // ✅ Agora enviando no formato ISO que o Spring espera
+    horario: horarioTexto,
+    status: 'AGENDADO'
+  };
+
+  agendamentos.push(novo);
+  enviarAgendamento(novo);
+  atualizarListaAgendamentos();
+}
 
 
-     
+
+     async function fetchBlockedDates(year, month) {
+  try {
+    const response = await fetch(`/api/blocked-dates?year=${year}&month=${month + 1}`);
+    const data = await response.json();
+    console.log("Datas bloqueadas recebidas:", data);
+    return data; // Já é array de strings, ex: ["2025-06-23", "2025-06-30"]
+  } catch (error) {
+    console.error("Erro ao buscar datas bloqueadas:", error);
+    return [];
+  }
+}
 
       // Calendário
       const calendarBody = document.getElementById("calendarBody");
@@ -927,69 +1007,79 @@
       let selectedDate = null;
       let currentDate = new Date();
 
-      function renderCalendar(date) {
-        const year = date.getFullYear();
-        const month = date.getMonth();
-        const firstDay = new Date(year, month, 1).getDay();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
+      async function renderCalendar(date) {
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-        const nomeMes = date.toLocaleString("pt-BR", { month: "long" });
-        if (monthYear) {
-          monthYear.innerHTML = `<span>${nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1)
-            }</span> <span>${year}</span>`;
+  const nomeMes = date.toLocaleString("pt-BR", { month: "long" });
+  if (monthYear) {
+    monthYear.innerHTML = `<span>${nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1)}</span> <span>${year}</span>`;
+  }
+
+  if (!calendarBody) return;
+  calendarBody.innerHTML = "";
+
+  let row = document.createElement("tr");
+
+  for (let i = 0; i < firstDay; i++) {
+    row.appendChild(document.createElement("td"));
+  }
+
+  const blockedDates = await fetchBlockedDates(year, month);
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    if (row.children.length === 7) {
+      calendarBody.appendChild(row);
+      row = document.createElement("tr");
+    }
+
+    const cell = document.createElement("td");
+    const span = document.createElement("span");
+    span.classList.add("calendar-day");
+    span.textContent = day;
+
+    const dateObj = new Date(year, month, day);
+    const dateStr = dateObj.toISOString().slice(0, 10);
+
+    // Bloqueia se for domingo (getDay() === 0) OU se estiver na lista de blockedDates
+    if (dateObj.getDay() === 0 || blockedDates.includes(dateStr)) {
+      span.classList.add("blocked");
+      // NÃO adiciona evento de clique
+    } else {
+      span.addEventListener("click", () => {
+        const clickedDate = new Date(year, month, day);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (clickedDate < today) {
+          alert("Você não pode selecionar uma data que já passou.");
+          return;
         }
 
-        if (!calendarBody) return;
-        calendarBody.innerHTML = "";
-        let row = document.createElement("tr");
+        selectedDate = clickedDate;
+        renderCalendar(currentDate);
+      });
+    }
 
-        for (let i = 0; i < firstDay; i++) {
-          row.appendChild(document.createElement("td"));
-        }
+    if (
+      selectedDate &&
+      selectedDate.getDate() === day &&
+      selectedDate.getMonth() === month &&
+      selectedDate.getFullYear() === year
+    ) {
+      span.classList.add("selected");
+    }
 
-        for (let day = 1; day <= daysInMonth; day++) {
-          if (row.children.length === 7) {
-            calendarBody.appendChild(row);
-            row = document.createElement("tr");
-          }
+    cell.appendChild(span);
+    row.appendChild(cell);
+  }
 
-          const cell = document.createElement("td");
-          const span = document.createElement("span");
-          span.classList.add("calendar-day");
-          span.textContent = day;
-
-          if (
-            selectedDate &&
-            selectedDate.getDate() === day &&
-            selectedDate.getMonth() === month &&
-            selectedDate.getFullYear() === year
-          ) {
-            span.classList.add("selected");
-          }
-
-          span.addEventListener("click", () => {
-            const clickedDate = new Date(year, month, day);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0); // Zera hora para comparar só a data
-
-            if (clickedDate < today) {
-              alert("Você não pode selecionar uma data que já passou.");
-              return;
-            }
-
-            selectedDate = clickedDate;
-            renderCalendar(currentDate);
-          });
-
-          cell.appendChild(span);
-          row.appendChild(cell);
-        }
-
-        if (row.children.length > 0) {
-          calendarBody.appendChild(row);
-        }
-      }
-
+  if (row.children.length > 0) {
+    calendarBody.appendChild(row);
+  }
+}
       if (prevMonthBtn) {
         prevMonthBtn.addEventListener("click", () => {
           currentDate.setMonth(currentDate.getMonth() - 1);
@@ -1012,7 +1102,7 @@
       if (btnSair) {
         btnSair.addEventListener("click", () => {
           // Redirecionar para a landing page
-          window.location.href = "../index.html"; // ou apenas "index.html" se não estiver em subpasta
+          window.location.href ="/logout"; // ou apenas "index.html" se não estiver em subpasta
         });
       }
     });
@@ -1084,30 +1174,45 @@
   return `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}T${horarioTexto}:00`;
 }
 
+const especialidades = [
+  "CILIOS_VOLUME_BRASILEIRO",
+  "CILIOS_EFEITO_FOX",
+  "CILIOS_EFEITO_MOLHADO",
+  "CILIOS_VOLUME_5D",
+  "SOBRANCELHAS_DESIGN",
+  "SOBRANCELHAS_DESIGN_HENNA",
+  "SOBRANCELHAS_BROW_LAMINATION",
+  "SOBRANCELHAS_LASH_LIFTING"
+];
+
 document.getElementById("btnConfirmarAgendamento").addEventListener("click", function () {
-  const descricaoServico = document.getElementById("confirmacaoServico").textContent.trim();
+  const servicoSelect = document.getElementById("servicoSelect");
+  const selectedIndex = servicoSelect.value;
+
+  if (selectedIndex === "") {
+    alert("Por favor, selecione um serviço!");
+    return;
+  }
+
+  const especialidadeSelecionada = especialidades[selectedIndex];
+
   const dataTexto = document.getElementById("confirmacaoData").textContent.trim();
   const horarioTexto = document.getElementById("confirmacaoHorario").textContent.trim();
 
-  // Conversão da data e hora para formato ISO
   const dataHora = converterDataTextoParaISO(dataTexto, horarioTexto);
-  console.log("dataHora:", dataHora);
 
-  // Exemplo de objeto que vai para o backend
   const agendamento = {
     data: dataHora,
-    valor: 50.0, // Pode pegar dinamicamente se quiser
-    especialidade: "SOBRANCELHAS_DESIGN", // Ajustar conforme sua lógica
+    valor: 50.0,
+    especialidade: especialidadeSelecionada,
     status: "AGENDADO",
-    cliente: { id: 1 },  // pegar dinamicamente
-    profissional: { id: 2 } // pegar dinamicamente
+    cliente: { id: 1 },
+    profissional: { id: 2 }
   };
 
   fetch("/api/agenda/novo", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(agendamento)
   })
   .then(response => {
@@ -1172,23 +1277,20 @@ function atualizarListaAgendamentos() {
 
 document.getElementById("btnExcluirAgendamento").addEventListener("click", () => {
   const index = document.getElementById("btnExcluirAgendamento").dataset.index;
+
   if (index !== undefined && agendamentos[index]) {
     const agendamentoId = agendamentos[index].id;
 
     fetch(`/api/agenda/${agendamentoId}/cancelar`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ status: "CANCELADO" })
+      method: "PUT"
     })
     .then(response => {
       if (!response.ok) throw new Error("Erro ao cancelar agendamento");
-      return response.json();
+      return response.text(); 
     })
-    .then(() => {
-      alert("Agendamento cancelado com sucesso!");
-      location.reload();  // <<< recarrega a página inteira
+    .then(msg => {
+      alert(msg);
+      location.reload();
     })
     .catch(error => {
       console.error(error);
